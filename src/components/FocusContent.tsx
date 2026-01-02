@@ -12,6 +12,8 @@ import {
   Battery,
   Zap,
   Calendar,
+  Star,
+  Target,
 } from 'lucide-react';
 
 const focusViews: { id: FocusView; label: string }[] = [
@@ -172,6 +174,52 @@ export function FocusContent() {
               </button>
             </div>
 
+            {/* Currently Focusing On - Hero Section */}
+            {isToday && scheduledActions.length > 0 && (
+              <div className="bg-gradient-to-br from-accent-50 to-warm-50 rounded-2xl border border-accent-200 p-6 shadow-sm">
+                <div className="flex items-center gap-2 mb-4">
+                  <Star className="w-5 h-5 text-accent-500" />
+                  <h2 className="text-lg font-serif font-semibold text-warm-900">Currently Focusing On</h2>
+                </div>
+                <div className="space-y-3">
+                  {scheduledActions.slice(0, 3).map(({ action, goal }) => (
+                    <div
+                      key={action.id}
+                      className="flex items-center gap-4 bg-white rounded-xl p-4 shadow-sm"
+                    >
+                      <button
+                        onClick={() => toggleActionComplete(goal.id, action.id)}
+                        className="w-7 h-7 rounded-full border-2 border-accent-400 flex items-center justify-center hover:bg-accent-50 transition-colors flex-shrink-0"
+                      >
+                        {action.status === 'done' && <Check className="w-4 h-4 text-accent-500" />}
+                      </button>
+                      <div className="flex-1">
+                        <p className="font-medium text-warm-800">{action.text}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Target className="w-3 h-3 text-warm-400" />
+                          <p className="text-xs text-warm-500">{goal.objective}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {scheduledActions.length > 3 && (
+                  <p className="text-center text-sm text-warm-500 mt-4">
+                    +{scheduledActions.length - 3} more actions scheduled
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* No Focus Message */}
+            {isToday && scheduledActions.length === 0 && (
+              <div className="bg-warm-100 rounded-2xl border border-warm-200 p-6 text-center">
+                <Star className="w-8 h-8 text-warm-400 mx-auto mb-3" />
+                <p className="text-warm-700 font-medium">Nothing scheduled for today</p>
+                <p className="text-sm text-warm-500 mt-1">Visit your goals and set something to focus on!</p>
+              </div>
+            )}
+
             {/* Energy Check-in (only show for today) */}
             {isToday && (
               <div className="bg-white rounded-xl border border-warm-200 p-5">
@@ -216,19 +264,18 @@ export function FocusContent() {
               </div>
             )}
 
-            {/* Scheduled Actions */}
-            <div className="bg-white rounded-xl border border-warm-200 p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-warm-500" />
-                  <span className="text-sm font-medium text-warm-700">Scheduled Actions</span>
+            {/* Other Scheduled Actions */}
+            {!isToday && scheduledActions.length > 0 && (
+              <div className="bg-white rounded-xl border border-warm-200 p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-warm-500" />
+                    <span className="text-sm font-medium text-warm-700">Scheduled Actions</span>
+                  </div>
+                  <span className="text-xs text-warm-400">
+                    {scheduledActions.length} items
+                  </span>
                 </div>
-                <span className="text-xs text-warm-400">
-                  {scheduledActions.length} items
-                </span>
-              </div>
-
-              {scheduledActions.length > 0 ? (
                 <div className="space-y-2">
                   {scheduledActions.map(({ action, goal }) => (
                     <div
@@ -248,14 +295,14 @@ export function FocusContent() {
                     </div>
                   ))}
                 </div>
-              ) : (
-                <p className="text-center py-8 text-warm-400 text-sm">
-                  {isToday
-                    ? "No actions scheduled. Visit your goals to schedule some!"
-                    : "No actions scheduled for this day."}
-                </p>
-              )}
-            </div>
+              </div>
+            )}
+
+            {!isToday && scheduledActions.length === 0 && (
+              <div className="bg-white rounded-xl border border-warm-200 p-8 text-center">
+                <p className="text-warm-500">No actions scheduled for this day.</p>
+              </div>
+            )}
           </div>
         )}
 

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { ViewToggle } from './ViewToggle';
-import { BentoGoalCard } from './BentoGoalCard';
+import { GoalProfileCard } from './GoalProfileCard';
 import { AntiGoalCard } from './AntiGoalCard';
 import { getCurrentQuarter, formatDate, getCategoryIcon, generateId } from '@/lib/utils';
 import type { GoalsView, GoalCategory, Goal, AntiGoal, SuccessMeasure, GoalAction } from '@/types';
@@ -149,36 +149,16 @@ export function GoalsContent() {
               </div>
             )}
 
-            {/* Goal Carousel */}
+            {/* Goal Profile Card - Tinder Style */}
             {currentGoal && (
-              <div className="mb-8 px-12">
-                <BentoGoalCard
+              <div className="mb-8">
+                <GoalProfileCard
                   goal={currentGoal}
                   onNext={nextGoal}
                   onPrev={prevGoal}
                   currentIndex={currentGoalIndex}
                   totalGoals={activeGoals.length}
                 />
-              </div>
-            )}
-
-            {/* Goal Selector Pills */}
-            {activeGoals.length > 1 && (
-              <div className="flex flex-wrap gap-2 justify-center mb-8">
-                {activeGoals.map((goal, index) => (
-                  <button
-                    key={goal.id}
-                    onClick={() => setCurrentGoalIndex(index)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                      index === currentGoalIndex
-                        ? 'bg-accent-500 text-white'
-                        : 'bg-white border border-warm-200 text-warm-600 hover:border-accent-300'
-                    }`}
-                  >
-                    {getCategoryIcon(goal.category)} {goal.objective.slice(0, 30)}
-                    {goal.objective.length > 30 ? '...' : ''}
-                  </button>
-                ))}
               </div>
             )}
 

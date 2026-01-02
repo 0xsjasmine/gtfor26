@@ -3,6 +3,7 @@ export { ViewToggle } from './ViewToggle';
 export { ProgressBar } from './ProgressBar';
 export { GoalCard } from './GoalCard';
 export { BentoGoalCard } from './BentoGoalCard';
+export { GoalProfileCard } from './GoalProfileCard';
 export { VibeCard } from './VibeCard';
 export { EnvyLogCard } from './EnvyLogCard';
 export { AntiGoalCard } from './AntiGoalCard';
