@@ -10,7 +10,6 @@ import {
   ChevronRight,
   Check,
   Battery,
-  Zap,
   Calendar,
   Star,
   Target,
@@ -24,7 +23,7 @@ const focusViews: { id: FocusView; label: string }[] = [
 
 const energyLevels: { value: EnergyLevel; label: string; color: string }[] = [
   { value: 1, label: 'Recharging', color: 'bg-accent-400' },
-  { value: 2, label: 'Low Vibe', color: 'bg-accent-300' },
+  { value: 2, label: 'Low Energy', color: 'bg-accent-300' },
   { value: 3, label: 'Rising', color: 'bg-warm-400' },
   { value: 4, label: 'Aligned', color: 'bg-sage-400' },
   { value: 5, label: 'In My Power', color: 'bg-sage-500' },
@@ -233,17 +232,13 @@ export function FocusContent() {
                       key={level.value}
                       onClick={() => updateTodayEnergy(level.value)}
                       className={cn(
-                        "flex-1 py-3 rounded-lg text-sm font-medium transition-all",
+                        "flex-1 py-3 rounded-lg text-xs font-medium transition-all text-center",
                         todayContext?.energy_level === level.value
                           ? `${level.color} text-white shadow-md`
                           : "bg-warm-100 text-warm-600 hover:bg-warm-200"
                       )}
                     >
-                      <Zap className={cn(
-                        "w-4 h-4 mx-auto mb-1",
-                        todayContext?.energy_level === level.value ? "text-white" : "text-warm-400"
-                      )} />
-                      <span className="text-xs">{level.label}</span>
+                      {level.label}
                     </button>
                   ))}
                 </div>
