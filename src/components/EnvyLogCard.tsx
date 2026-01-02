@@ -8,14 +8,14 @@ interface EnvyLogCardProps {
 }
 
 const categoryColors: Record<EnvyCategory, string> = {
-  travel: 'bg-sky-100 text-sky-700',
-  career: 'bg-purple-100 text-purple-700',
-  relationships: 'bg-pink-100 text-pink-700',
-  creative: 'bg-orange-100 text-orange-700',
-  recognition: 'bg-yellow-100 text-yellow-700',
-  freedom: 'bg-teal-100 text-teal-700',
-  lifestyle: 'bg-indigo-100 text-indigo-700',
-  other: 'bg-gray-100 text-gray-700',
+  travel: 'bg-sage-100 text-sage-700',
+  career: 'bg-accent-100 text-accent-700',
+  relationships: 'bg-accent-50 text-accent-600',
+  creative: 'bg-warm-200 text-warm-700',
+  recognition: 'bg-warm-100 text-warm-600',
+  freedom: 'bg-sage-50 text-sage-600',
+  lifestyle: 'bg-warm-100 text-warm-700',
+  other: 'bg-warm-100 text-warm-600',
 };
 
 const categoryIcons: Record<EnvyCategory, string> = {
@@ -31,18 +31,18 @@ const categoryIcons: Record<EnvyCategory, string> = {
 
 export function EnvyLogCard({ log }: EnvyLogCardProps) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4">
+    <div className="bg-white rounded-lg border border-warm-200 p-4">
       <div className="flex items-start justify-between mb-2">
         <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${categoryColors[log.category_tag]}`}>
           {categoryIcons[log.category_tag]} {log.category_tag}
         </span>
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-warm-400">
           {formatDate(log.date, 'MMM d')}
         </span>
       </div>
-      <p className="text-gray-800 text-sm">{log.trigger}</p>
+      <p className="text-warm-800 text-sm">{log.trigger}</p>
       {log.notes && (
-        <p className="mt-2 text-xs text-gray-500 italic">{log.notes}</p>
+        <p className="mt-2 text-xs text-warm-500 italic">{log.notes}</p>
       )}
     </div>
   );

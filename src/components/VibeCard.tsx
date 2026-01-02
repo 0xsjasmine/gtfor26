@@ -4,7 +4,6 @@ import { cn, getVibeDescription, formatWeekRange } from '@/lib/utils';
 import type { VibeType } from '@/types';
 import { Zap, Users, Layers, Moon, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
-import { useAppStore } from '@/store/app-store';
 
 interface VibeCardProps {
   vibeType: VibeType;
@@ -21,10 +20,10 @@ const vibeIcons: Record<VibeType, React.ReactNode> = {
 };
 
 const vibeColors: Record<VibeType, string> = {
-  'Deep Build': 'bg-purple-100 text-purple-700 border-purple-300',
-  'Community': 'bg-blue-100 text-blue-700 border-blue-300',
-  'Integration': 'bg-green-100 text-green-700 border-green-300',
-  'Rest': 'bg-amber-100 text-amber-700 border-amber-300',
+  'Deep Build': 'bg-accent-50 text-accent-800 border-accent-300',
+  'Community': 'bg-sage-50 text-sage-800 border-sage-300',
+  'Integration': 'bg-warm-100 text-warm-800 border-warm-300',
+  'Rest': 'bg-warm-50 text-warm-700 border-warm-200',
 };
 
 const allVibes: VibeType[] = ['Deep Build', 'Community', 'Integration', 'Rest'];
@@ -41,7 +40,7 @@ export function VibeCard({ vibeType, weekRange, isUserOverride, onChangeVibe }: 
         <div className="flex items-center gap-3">
           {vibeIcons[vibeType]}
           <div>
-            <h2 className="text-xl font-semibold">{vibeType} Mode</h2>
+            <h2 className="text-xl font-serif font-semibold">{vibeType} Mode</h2>
             <p className="text-sm opacity-80">
               {weekRange || formatWeekRange()}
             </p>
@@ -59,7 +58,7 @@ export function VibeCard({ vibeType, weekRange, isUserOverride, onChangeVibe }: 
             </button>
 
             {showDropdown && (
-              <div className="absolute right-0 top-10 w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10">
+              <div className="absolute right-0 top-10 w-40 bg-white border border-warm-200 rounded-lg shadow-lg py-1 z-10">
                 {allVibes.map((vibe) => (
                   <button
                     key={vibe}
@@ -68,8 +67,8 @@ export function VibeCard({ vibeType, weekRange, isUserOverride, onChangeVibe }: 
                       setShowDropdown(false);
                     }}
                     className={cn(
-                      'w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2',
-                      vibe === vibeType && 'bg-gray-50 font-medium'
+                      'w-full px-3 py-2 text-left text-sm hover:bg-warm-50 flex items-center gap-2 text-warm-800',
+                      vibe === vibeType && 'bg-warm-50 font-medium'
                     )}
                   >
                     {vibeIcons[vibe]}
@@ -87,7 +86,7 @@ export function VibeCard({ vibeType, weekRange, isUserOverride, onChangeVibe }: 
       </p>
 
       {isUserOverride && (
-        <p className="mt-2 text-xs opacity-60">
+        <p className="mt-2 text-xs opacity-60 italic">
           (You overrode the AI suggestion)
         </p>
       )}

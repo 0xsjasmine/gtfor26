@@ -9,23 +9,54 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#f0fdfa',
-          100: '#ccfbf1',
-          200: '#99f6e4',
-          300: '#5eead4',
-          400: '#2dd4bf',
-          500: '#14b8a6',
-          600: '#0d9488',
-          700: '#0f766e',
-          800: '#115e59',
-          900: '#134e4a',
+        // Warm, chic color palette
+        warm: {
+          50: '#fdfcfb',
+          100: '#faf7f5',
+          200: '#f5ebe5',
+          300: '#e8d5c8',
+          400: '#d4b5a0',
+          500: '#c49a7c',
+          600: '#a67c5b',
+          700: '#8a6548',
+          800: '#6d503a',
+          900: '#4a3628',
+        },
+        // Accent - warm rose/blush
+        accent: {
+          50: '#fdf8f6',
+          100: '#fbeee9',
+          200: '#f8dcd2',
+          300: '#f2c4b3',
+          400: '#e8a088',
+          500: '#d97b5d',
+          600: '#c45d3e',
+          700: '#a34832',
+          800: '#853c2b',
+          900: '#6d3426',
+        },
+        // Soft sage for balance
+        sage: {
+          50: '#f6f7f6',
+          100: '#e3e7e3',
+          200: '#c7cfc7',
+          300: '#a3b0a3',
+          400: '#7d8f7d',
+          500: '#617161',
+          600: '#4d5a4d',
+          700: '#404940',
+          800: '#363d36',
+          900: '#2f332f',
         },
         status: {
-          success: '#22c55e',
-          warning: '#eab308',
-          danger: '#ef4444',
+          success: '#7d8f7d',
+          warning: '#d4a574',
+          danger: '#c45d3e',
         }
+      },
+      fontFamily: {
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        serif: ['Georgia', 'Cambria', 'Times New Roman', 'serif'],
       },
     },
   },

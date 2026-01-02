@@ -115,40 +115,40 @@ export function AIChat() {
 
   if (isChatMinimized) {
     return (
-      <div className="w-16 bg-white border-l border-gray-200 flex flex-col items-center py-4">
+      <div className="w-16 bg-white border-l border-warm-200 flex flex-col items-center py-4">
         <button
           onClick={toggleChat}
-          className="p-3 bg-primary-100 text-primary-700 rounded-full hover:bg-primary-200"
+          className="p-3 bg-accent-100 text-accent-700 rounded-full hover:bg-accent-200"
         >
           <Maximize2 className="w-5 h-5" />
         </button>
-        <span className="mt-2 text-xs text-gray-500 writing-mode-vertical">Chat</span>
+        <span className="mt-2 text-xs text-warm-500 writing-mode-vertical">Chat</span>
       </div>
     );
   }
 
   return (
-    <div className="w-80 bg-white border-l border-gray-200 flex flex-col h-screen">
+    <div className="w-80 bg-white border-l border-warm-200 flex flex-col h-screen">
       {/* Header */}
-      <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+      <div className="p-4 border-b border-warm-100 flex items-center justify-between">
         <div>
-          <h2 className="font-semibold text-gray-900">AI Assistant</h2>
-          <p className="text-xs text-gray-500">Claude Sonnet 4.5</p>
+          <h2 className="font-semibold text-warm-900">Your Guide</h2>
+          <p className="text-xs text-warm-500 italic">Here to help you stay on track</p>
         </div>
         <button
           onClick={toggleChat}
-          className="p-2 hover:bg-gray-100 rounded-lg"
+          className="p-2 hover:bg-warm-100 rounded-lg"
         >
-          <Minimize2 className="w-4 h-4 text-gray-500" />
+          <Minimize2 className="w-4 h-4 text-warm-500" />
         </button>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-warm-50">
         {chatMessages.length === 0 && (
-          <div className="text-center text-gray-500 py-8">
-            <p className="mb-2">Hey! How's your energy today?</p>
-            <p className="text-sm">I'm here to help you stay focused and track your progress.</p>
+          <div className="text-center text-warm-600 py-8">
+            <p className="mb-2 font-medium">Hey! How's your energy today?</p>
+            <p className="text-sm text-warm-500">I'm here to help you stay focused and track your progress.</p>
           </div>
         )}
 
@@ -164,8 +164,8 @@ export function AIChat() {
               className={cn(
                 'max-w-[85%] rounded-2xl px-4 py-2.5',
                 message.role === 'user'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-gray-100 text-gray-800'
+                  ? 'bg-accent-500 text-white'
+                  : 'bg-white text-warm-800 border border-warm-200'
               )}
             >
               <p className="text-sm whitespace-pre-wrap">{message.content}</p>
@@ -175,8 +175,8 @@ export function AIChat() {
 
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 rounded-2xl px-4 py-2.5">
-              <Loader2 className="w-5 h-5 text-gray-500 animate-spin" />
+            <div className="bg-white border border-warm-200 rounded-2xl px-4 py-2.5">
+              <Loader2 className="w-5 h-5 text-accent-500 animate-spin" />
             </div>
           </div>
         )}
@@ -185,16 +185,16 @@ export function AIChat() {
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-gray-100">
+      <form onSubmit={handleSubmit} className="p-4 border-t border-warm-100 bg-white">
         <div className="flex items-end gap-2">
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Share your progress, doubts, or envy..."
+            placeholder="Share your progress, doubts, or feelings..."
             rows={1}
-            className="flex-1 px-4 py-2.5 bg-gray-100 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm max-h-32"
+            className="flex-1 px-4 py-2.5 bg-warm-50 border border-warm-200 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-transparent text-sm max-h-32"
             style={{ minHeight: '44px' }}
           />
           <button
@@ -203,8 +203,8 @@ export function AIChat() {
             className={cn(
               'p-2.5 rounded-full transition-colors',
               input.trim() && !isLoading
-                ? 'bg-primary-600 text-white hover:bg-primary-700'
-                : 'bg-gray-200 text-gray-400'
+                ? 'bg-accent-500 text-white hover:bg-accent-600'
+                : 'bg-warm-200 text-warm-400'
             )}
           >
             <Send className="w-5 h-5" />

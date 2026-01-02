@@ -1,6 +1,6 @@
 'use client';
 
-import { cn, getKPIStatus, getStatusColorClass } from '@/lib/utils';
+import { cn, getKPIStatus } from '@/lib/utils';
 
 interface ProgressBarProps {
   current: number;
@@ -19,7 +19,12 @@ export function ProgressBar({
 }: ProgressBarProps) {
   const progress = Math.min((current / target) * 100, 100);
   const status = getKPIStatus(current, target);
-  const colorClass = getStatusColorClass(status);
+
+  const statusColors = {
+    on_track: 'bg-sage-400',
+    behind: 'bg-status-warning',
+    blocked: 'bg-status-danger',
+  };
 
   const heights = {
     sm: 'h-1.5',
@@ -32,20 +37,20 @@ export function ProgressBar({
       {(label || showValues) && (
         <div className="flex justify-between items-center mb-1.5">
           {label && (
-            <span className="text-sm font-medium text-gray-700">{label}</span>
+            <span className="text-sm font-medium text-warm-700">{label}</span>
           )}
           {showValues && (
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-warm-500">
               {current} / {target}
             </span>
           )}
         </div>
       )}
-      <div className={cn('w-full bg-gray-200 rounded-full overflow-hidden', heights[size])}>
+      <div className={cn('w-full bg-warm-200 rounded-full overflow-hidden', heights[size])}>
         <div
           className={cn(
             'h-full rounded-full animate-progress',
-            colorClass
+            statusColors[status]
           )}
           style={{ width: `${progress}%` }}
         />

@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'GTFOR26 - AI-Powered Goal Management',
-  description: 'An LLM-powered quarterly goal management platform for ambitious twentysomethings',
+  title: 'Whatever It Takes',
+  description: 'An LLM-powered quarterly goal management platform',
 };
 
 export default function RootLayout({

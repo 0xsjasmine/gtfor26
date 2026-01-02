@@ -10,4 +10,3 @@ export { GoalsContent } from './GoalsContent';
 export { SignalsContent } from './SignalsContent';
 export { MainContent } from './MainContent';
 export { AIChat } from './AIChat';
-export { Onboarding } from './Onboarding';

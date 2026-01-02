@@ -19,7 +19,7 @@ export function GoalCard({ goal, isBacklogged = false, onUpdate }: GoalCardProps
   const status = getKPIStatus(goal.kpi_current, goal.kpi_target);
 
   const statusColors = {
-    on_track: 'border-l-status-success',
+    on_track: 'border-l-sage-400',
     behind: 'border-l-status-warning',
     blocked: 'border-l-status-danger',
   };
@@ -33,7 +33,7 @@ export function GoalCard({ goal, isBacklogged = false, onUpdate }: GoalCardProps
   return (
     <div
       className={cn(
-        'bg-white rounded-lg border border-gray-200 p-4 border-l-4',
+        'bg-white rounded-lg border border-warm-200 p-4 border-l-4',
         statusColors[status],
         isBacklogged && 'opacity-50'
       )}
@@ -43,33 +43,33 @@ export function GoalCard({ goal, isBacklogged = false, onUpdate }: GoalCardProps
           <span className="text-lg">{getCategoryIcon(goal.category)}</span>
           <div>
             <h3 className={cn(
-              'font-medium text-gray-900',
-              isBacklogged && 'text-gray-500'
+              'font-medium text-warm-900',
+              isBacklogged && 'text-warm-500'
             )}>
               {goal.description}
             </h3>
-            <span className="text-xs text-gray-500 capitalize">{goal.category}</span>
+            <span className="text-xs text-warm-500 capitalize">{goal.category}</span>
           </div>
         </div>
 
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="p-1 hover:bg-gray-100 rounded"
+            className="p-1 hover:bg-warm-100 rounded"
           >
-            <MoreVertical className="w-4 h-4 text-gray-400" />
+            <MoreVertical className="w-4 h-4 text-warm-400" />
           </button>
 
           {showMenu && (
-            <div className="absolute right-0 top-8 w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10">
+            <div className="absolute right-0 top-8 w-40 bg-white border border-warm-200 rounded-lg shadow-lg py-1 z-10">
               <button
                 onClick={() => {
                   updateGoal(goal.id, { status: 'completed' });
                   setShowMenu(false);
                 }}
-                className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                className="w-full px-3 py-2 text-left text-sm hover:bg-warm-50 flex items-center gap-2"
               >
-                <CheckCircle className="w-4 h-4 text-green-500" />
+                <CheckCircle className="w-4 h-4 text-sage-500" />
                 Mark Complete
               </button>
               <button
@@ -77,9 +77,9 @@ export function GoalCard({ goal, isBacklogged = false, onUpdate }: GoalCardProps
                   updateGoal(goal.id, { status: goal.status === 'backlogged' ? 'active' : 'backlogged' });
                   setShowMenu(false);
                 }}
-                className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                className="w-full px-3 py-2 text-left text-sm hover:bg-warm-50 flex items-center gap-2"
               >
-                <Archive className="w-4 h-4 text-yellow-500" />
+                <Archive className="w-4 h-4 text-warm-500" />
                 {goal.status === 'backlogged' ? 'Activate' : 'Backlog'}
               </button>
               <button
@@ -87,7 +87,7 @@ export function GoalCard({ goal, isBacklogged = false, onUpdate }: GoalCardProps
                   deleteGoal(goal.id);
                   setShowMenu(false);
                 }}
-                className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2 text-red-600"
+                className="w-full px-3 py-2 text-left text-sm hover:bg-warm-50 flex items-center gap-2 text-accent-600"
               >
                 <Trash2 className="w-4 h-4" />
                 Delete
@@ -107,13 +107,13 @@ export function GoalCard({ goal, isBacklogged = false, onUpdate }: GoalCardProps
         <div className="flex gap-2 mt-3">
           <button
             onClick={() => handleUpdateKPI(-1)}
-            className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded"
+            className="px-3 py-1 text-sm bg-warm-100 hover:bg-warm-200 text-warm-700 rounded"
           >
             -1
           </button>
           <button
             onClick={() => handleUpdateKPI(1)}
-            className="px-3 py-1 text-sm bg-primary-100 hover:bg-primary-200 text-primary-700 rounded"
+            className="px-3 py-1 text-sm bg-accent-100 hover:bg-accent-200 text-accent-700 rounded"
           >
             +1
           </button>
@@ -121,7 +121,7 @@ export function GoalCard({ goal, isBacklogged = false, onUpdate }: GoalCardProps
       )}
 
       {isBacklogged && (
-        <p className="mt-3 text-xs text-gray-400">
+        <p className="mt-3 text-xs text-warm-400 italic">
           Backlogged to {goal.quarter}
         </p>
       )}

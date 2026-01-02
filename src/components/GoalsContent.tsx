@@ -94,13 +94,13 @@ export function GoalsContent() {
   };
 
   return (
-    <div className="h-full overflow-auto p-6">
+    <div className="h-full overflow-auto p-6 bg-warm-50">
       <div className="max-w-3xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Goals</h1>
-            <p className="text-gray-500">{quarter}</p>
+            <h1 className="text-2xl font-serif font-bold text-warm-900">Goals</h1>
+            <p className="text-warm-500">{quarter}</p>
           </div>
           <ViewToggle
             views={goalsViews}
@@ -113,8 +113,8 @@ export function GoalsContent() {
           <>
             {/* Overall Progress */}
             {totalTarget > 0 && (
-              <div className="mb-6 p-4 bg-white rounded-xl border border-gray-200">
-                <h3 className="font-medium text-gray-700 mb-2">Quarter Progress</h3>
+              <div className="mb-6 p-4 bg-white rounded-xl border border-warm-200">
+                <h3 className="font-medium text-warm-700 mb-2">Quarter Progress</h3>
                 <ProgressBar current={totalCurrent} target={totalTarget} size="lg" />
               </div>
             )}
@@ -126,7 +126,7 @@ export function GoalsContent() {
 
               return (
                 <div key={category} className="mb-6">
-                  <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <h2 className="text-lg font-semibold text-warm-800 mb-3 flex items-center gap-2">
                     <span>{getCategoryIcon(category)}</span>
                     <span className="capitalize">{category}</span>
                   </h2>
@@ -143,17 +143,17 @@ export function GoalsContent() {
             {!showAddGoal ? (
               <button
                 onClick={() => setShowAddGoal(true)}
-                className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 hover:border-primary-400 hover:text-primary-600 flex items-center justify-center gap-2"
+                className="w-full p-4 border-2 border-dashed border-warm-300 rounded-xl text-warm-500 hover:border-accent-400 hover:text-accent-600 flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
                 Add Goal
               </button>
             ) : (
-              <div className="p-4 bg-white rounded-xl border border-gray-200">
+              <div className="p-4 bg-white rounded-xl border border-warm-200">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-medium">New Goal</h3>
+                  <h3 className="font-medium text-warm-800">New Goal</h3>
                   <button onClick={() => setShowAddGoal(false)}>
-                    <X className="w-5 h-5 text-gray-400" />
+                    <X className="w-5 h-5 text-warm-400" />
                   </button>
                 </div>
                 <div className="space-y-3">
@@ -162,13 +162,13 @@ export function GoalsContent() {
                     placeholder="Goal description..."
                     value={newGoal.description}
                     onChange={(e) => setNewGoal({ ...newGoal, description: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 border border-warm-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-400"
                   />
                   <div className="flex gap-3">
                     <select
                       value={newGoal.category}
                       onChange={(e) => setNewGoal({ ...newGoal, category: e.target.value as GoalCategory })}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="flex-1 px-3 py-2 border border-warm-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-400"
                     >
                       {categories.map((cat) => (
                         <option key={cat} value={cat}>
@@ -181,7 +181,7 @@ export function GoalsContent() {
                       placeholder="Target"
                       value={newGoal.kpi_target}
                       onChange={(e) => setNewGoal({ ...newGoal, kpi_target: parseInt(e.target.value) || 0 })}
-                      className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-24 px-3 py-2 border border-warm-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-400"
                     />
                   </div>
                   <input
@@ -189,11 +189,11 @@ export function GoalsContent() {
                     placeholder="KPI metric (e.g., blog posts published)"
                     value={newGoal.kpi_metric}
                     onChange={(e) => setNewGoal({ ...newGoal, kpi_metric: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 border border-warm-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-400"
                   />
                   <button
                     onClick={handleAddGoal}
-                    className="w-full py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                    className="w-full py-2 bg-accent-500 text-white rounded-lg hover:bg-accent-600"
                   >
                     Add Goal
                   </button>
@@ -203,8 +203,8 @@ export function GoalsContent() {
 
             {/* Anti-Goals Section */}
             <div className="mt-8">
-              <h2 className="text-lg font-semibold text-gray-800 mb-3">Anti-Goals</h2>
-              <p className="text-sm text-gray-500 mb-4">Who you're choosing NOT to become this quarter.</p>
+              <h2 className="text-lg font-semibold text-warm-800 mb-3">Anti-Goals</h2>
+              <p className="text-sm text-warm-500 mb-4">Who you're choosing NOT to become this quarter.</p>
 
               {antiGoals.length > 0 && (
                 <div className="space-y-3 mb-4">
@@ -217,17 +217,17 @@ export function GoalsContent() {
               {!showAddAntiGoal ? (
                 <button
                   onClick={() => setShowAddAntiGoal(true)}
-                  className="w-full p-4 border-2 border-dashed border-red-200 rounded-xl text-red-400 hover:border-red-400 hover:text-red-600 flex items-center justify-center gap-2"
+                  className="w-full p-4 border-2 border-dashed border-accent-200 rounded-xl text-accent-400 hover:border-accent-400 hover:text-accent-600 flex items-center justify-center gap-2"
                 >
                   <Plus className="w-5 h-5" />
                   Add Anti-Goal
                 </button>
               ) : (
-                <div className="p-4 bg-red-50 rounded-xl border border-red-200">
+                <div className="p-4 bg-accent-50 rounded-xl border border-accent-200">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-medium text-red-800">New Anti-Goal</h3>
+                    <h3 className="font-medium text-accent-800">New Anti-Goal</h3>
                     <button onClick={() => setShowAddAntiGoal(false)}>
-                      <X className="w-5 h-5 text-red-400" />
+                      <X className="w-5 h-5 text-accent-400" />
                     </button>
                   </div>
                   <input
@@ -235,11 +235,11 @@ export function GoalsContent() {
                     placeholder='e.g., "Not the person who says yes to everything"'
                     value={newAntiGoal}
                     onChange={(e) => setNewAntiGoal(e.target.value)}
-                    className="w-full px-3 py-2 border border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 mb-3"
+                    className="w-full px-3 py-2 border border-accent-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-400 mb-3"
                   />
                   <button
                     onClick={handleAddAntiGoal}
-                    className="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                    className="w-full py-2 bg-accent-500 text-white rounded-lg hover:bg-accent-600"
                   >
                     Add Anti-Goal
                   </button>
@@ -252,7 +252,7 @@ export function GoalsContent() {
         {goalsView === 'month' && (
           <>
             <div className="mb-6">
-              <h2 className="text-lg font-semibold text-gray-800 mb-3">
+              <h2 className="text-lg font-semibold text-warm-800 mb-3">
                 {formatDate(new Date(), 'MMMM yyyy')} Progress
               </h2>
               {activeGoals.length > 0 ? (
@@ -262,13 +262,13 @@ export function GoalsContent() {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-8">No active goals this month.</p>
+                <p className="text-warm-500 text-center py-8">No active goals this month.</p>
               )}
             </div>
 
             {completedGoals.length > 0 && (
               <div>
-                <h2 className="text-lg font-semibold text-gray-500 mb-3">Completed</h2>
+                <h2 className="text-lg font-semibold text-warm-500 mb-3">Completed</h2>
                 <div className="space-y-3 opacity-60">
                   {completedGoals.map((goal) => (
                     <GoalCard key={goal.id} goal={goal} />
@@ -281,7 +281,7 @@ export function GoalsContent() {
 
         {goalsView === 'backlog' && (
           <>
-            <p className="text-gray-600 mb-6">
+            <p className="text-warm-600 mb-6 italic">
               Items you've consciously deprioritized. Later, not never.
             </p>
 
@@ -292,7 +292,7 @@ export function GoalsContent() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-12 text-warm-500">
                 <p>No backlogged items yet.</p>
                 <p className="text-sm mt-1">Items you deprioritize will appear here.</p>
               </div>
@@ -300,15 +300,15 @@ export function GoalsContent() {
 
             {backlogItems.length > 0 && (
               <div className="mt-8">
-                <h2 className="text-lg font-semibold text-gray-800 mb-3">Other Backlog Items</h2>
+                <h2 className="text-lg font-semibold text-warm-800 mb-3">Other Backlog Items</h2>
                 <div className="space-y-3">
                   {backlogItems.map((item) => (
                     <div
                       key={item.id}
-                      className="bg-gray-50 border border-gray-200 rounded-lg p-4"
+                      className="bg-white border border-warm-200 rounded-lg p-4"
                     >
-                      <p className="text-gray-700">{item.description}</p>
-                      <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                      <p className="text-warm-700">{item.description}</p>
+                      <div className="flex items-center gap-4 mt-2 text-xs text-warm-500">
                         <span>Target: {item.target_quarter}</span>
                         <span>Mentioned {item.times_mentioned}x</span>
                       </div>
