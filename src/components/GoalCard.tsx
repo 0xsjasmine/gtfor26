@@ -1,7 +1,6 @@
 'use client';
 
-import { cn, getCategoryIcon, getKPIStatus } from '@/lib/utils';
-import { ProgressBar } from './ProgressBar';
+import { cn, getCategoryIcon } from '@/lib/utils';
 import type { Goal } from '@/types';
 import { useAppStore } from '@/store/app-store';
 import { MoreVertical, Archive, CheckCircle, Trash2 } from 'lucide-react';
@@ -10,24 +9,32 @@ import { useState } from 'react';
 interface GoalCardProps {
   goal: Goal;
   isBacklogged?: boolean;
-  onUpdate?: (id: string, updates: Partial<Goal>) => void;
 }
 
-export function GoalCard({ goal, isBacklogged = false, onUpdate }: GoalCardProps) {
+export function GoalCard({ goal, isBacklogged = false }: GoalCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const { updateGoal, deleteGoal } = useAppStore();
-  const status = getKPIStatus(goal.kpi_current, goal.kpi_target);
+
+  // Calculate progress from success measures
+  const totalProgress = goal.success_measures.reduce((acc, m) => {
+    return acc + (m.current / m.target);
+  }, 0);
+  const avgProgress = goal.success_measures.length > 0
+    ? Math.round((totalProgress / goal.success_measures.length) * 100)
+    : 0;
+
+  const getProgressStatus = () => {
+    if (avgProgress >= 75) return 'on_track';
+    if (avgProgress >= 40) return 'behind';
+    return 'blocked';
+  };
+
+  const status = getProgressStatus();
 
   const statusColors = {
     on_track: 'border-l-sage-400',
     behind: 'border-l-status-warning',
     blocked: 'border-l-status-danger',
-  };
-
-  const handleUpdateKPI = (increment: number) => {
-    const newValue = Math.max(0, Math.min(goal.kpi_target, goal.kpi_current + increment));
-    updateGoal(goal.id, { kpi_current: newValue });
-    if (onUpdate) onUpdate(goal.id, { kpi_current: newValue });
   };
 
   return (
@@ -46,7 +53,7 @@ export function GoalCard({ goal, isBacklogged = false, onUpdate }: GoalCardProps
               'font-medium text-warm-900',
               isBacklogged && 'text-warm-500'
             )}>
-              {goal.description}
+              {goal.objective}
             </h3>
             <span className="text-xs text-warm-500 capitalize">{goal.category}</span>
           </div>
@@ -97,26 +104,29 @@ export function GoalCard({ goal, isBacklogged = false, onUpdate }: GoalCardProps
         </div>
       </div>
 
-      <ProgressBar
-        current={goal.kpi_current}
-        target={goal.kpi_target}
-        label={goal.kpi_metric}
-      />
+      {/* Progress bar */}
+      <div className="w-full">
+        <div className="flex justify-between items-center mb-1.5">
+          <span className="text-sm font-medium text-warm-700">Progress</span>
+          <span className="text-sm text-warm-500">{avgProgress}%</span>
+        </div>
+        <div className="w-full bg-warm-200 rounded-full overflow-hidden h-2.5">
+          <div
+            className={cn(
+              'h-full rounded-full',
+              status === 'on_track' ? 'bg-sage-400' :
+              status === 'behind' ? 'bg-status-warning' :
+              'bg-status-danger'
+            )}
+            style={{ width: `${avgProgress}%` }}
+          />
+        </div>
+      </div>
 
-      {!isBacklogged && (
-        <div className="flex gap-2 mt-3">
-          <button
-            onClick={() => handleUpdateKPI(-1)}
-            className="px-3 py-1 text-sm bg-warm-100 hover:bg-warm-200 text-warm-700 rounded"
-          >
-            -1
-          </button>
-          <button
-            onClick={() => handleUpdateKPI(1)}
-            className="px-3 py-1 text-sm bg-accent-100 hover:bg-accent-200 text-accent-700 rounded"
-          >
-            +1
-          </button>
+      {/* Action count */}
+      {goal.actions.length > 0 && (
+        <div className="mt-3 text-xs text-warm-500">
+          {goal.actions.filter(a => a.status === 'done').length}/{goal.actions.length} actions completed
         </div>
       )}
 

@@ -15,17 +15,44 @@ export type GoalStatus = 'active' | 'backlogged' | 'completed' | 'dropped';
 // KPI status based on progress
 export type KPIStatus = 'on_track' | 'behind' | 'blocked';
 
-// Goal type
+// Success measure for goals
+export interface SuccessMeasure {
+  id: string;
+  metric: string;
+  target: number;
+  current: number;
+  unit?: string;
+}
+
+// Action status
+export type ActionStatus = 'pending' | 'scheduled' | 'done' | 'skipped';
+
+// Action priority
+export type ActionPriority = 'high' | 'medium' | 'low';
+
+// Goal action
+export interface GoalAction {
+  id: string;
+  text: string;
+  status: ActionStatus;
+  priority: ActionPriority;
+  scheduled_date?: string;
+  completed_date?: string;
+  estimated_minutes?: number;
+  goal_id: string;
+}
+
+// Restructured Goal type
 export interface Goal {
   id: string;
   user_id: string;
   quarter: string;
   category: GoalCategory;
-  description: string;
-  kpi_metric: string;
-  kpi_target: number;
-  kpi_current: number;
+  objective: string;           // What you're achieving
+  why: string;                 // Flight story / personal motivation
   status: GoalStatus;
+  success_measures: SuccessMeasure[];
+  actions: GoalAction[];
   created_at: string;
   updated_at: string;
 }
@@ -54,16 +81,49 @@ export interface VibeCode {
   is_user_override: boolean;
 }
 
-// Daily check-in type
+// Energy level scale
+export type EnergyLevel = 1 | 2 | 3 | 4 | 5;
+
+// Cycle phase for adaptive intelligence
+export type CyclePhase = 'menstrual' | 'follicular' | 'ovulatory' | 'luteal' | 'not_tracking';
+
+// User context for adaptive AI
+export interface UserContext {
+  id: string;
+  user_id: string;
+  date: string;
+  energy_level: EnergyLevel;
+  cycle_phase?: CyclePhase;
+  sleep_hours?: number;
+  mood_notes?: string;
+  external_stressors?: string[];
+  created_at: string;
+}
+
+// Daily check-in type (enhanced)
 export interface DailyCheckIn {
   id: string;
   user_id: string;
   date: string;
-  energy_level: number;
+  energy_level: EnergyLevel;
   accomplishments: string;
   doubts: string;
   opportunities: string;
   mood_context?: string;
+  created_at: string;
+}
+
+// Journal entry type (5-minute journal style)
+export type JournalType = 'morning' | 'evening' | 'weekly_planning' | 'weekly_review';
+
+export interface JournalEntry {
+  id: string;
+  user_id: string;
+  date: string;
+  type: JournalType;
+  prompts: string[];
+  responses: string[];
+  ai_reflection?: string;
   created_at: string;
 }
 
@@ -110,12 +170,12 @@ export interface Reflection {
   llm_questions: string[];
   user_responses: string[];
   llm_insights: string;
-  retrospective_validation?: Record<string, any>;
+  retrospective_validation?: Record<string, unknown>;
   created_at: string;
 }
 
 // Chat message role
-export type ChatRole = 'user' | 'assistant';
+export type ChatRole = 'user' | 'assistant' | 'system';
 
 // Chat message type
 export interface ChatMessage {
@@ -128,17 +188,40 @@ export interface ChatMessage {
   created_at: string;
 }
 
+// Scheduled action for calendar
+export interface ScheduledAction {
+  id: string;
+  action: GoalAction;
+  goal: Goal;
+  date: string;
+  time_slot?: string;
+  is_completed: boolean;
+  is_ai_suggested: boolean;
+}
+
 // Navigation tabs
 export type NavTab = 'focus' | 'goals' | 'signals';
 
-// Focus view types
-export type FocusView = 'week' | 'day' | 'quarter';
+// Focus view types - now calendar-based
+export type FocusView = 'day' | 'week' | 'month';
 
 // Goals view types
 export type GoalsView = 'quarter' | 'month' | 'backlog';
 
 // Signals view types
 export type SignalsView = 'envy' | 'reflections';
+
+// AI suggestion type
+export interface AISuggestion {
+  id: string;
+  type: 'action' | 'reschedule' | 'reflection' | 'break';
+  content: string;
+  related_goal_id?: string;
+  suggested_date?: string;
+  reasoning?: string;
+  is_accepted?: boolean;
+  created_at: string;
+}
 
 // App state for navigation
 export interface AppState {

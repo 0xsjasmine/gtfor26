@@ -2,9 +2,16 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useAppStore } from '@/store/app-store';
-import { Send, Minimize2, Maximize2, Loader2 } from 'lucide-react';
+import { Send, Minimize2, Maximize2, Loader2, Sparkles } from 'lucide-react';
 import { cn, generateId } from '@/lib/utils';
 import type { ChatMessage } from '@/types';
+
+const quickPrompts = [
+  { label: "How's today?", text: "How am I doing today?" },
+  { label: "Plan actions", text: "Help me plan my next actions for my current goal" },
+  { label: "Feeling stuck", text: "I'm feeling stuck and not sure what to focus on" },
+  { label: "Weekly review", text: "Let's do a quick weekly review" },
+];
 
 export function AIChat() {
   const {
@@ -19,12 +26,18 @@ export function AIChat() {
     goals,
     currentVibeCode,
     antiGoals,
+    getTodayContext,
+    journalEntries,
   } = useAppStore();
 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  const todayContext = getTodayContext();
+  const currentHour = new Date().getHours();
+  const greeting = currentHour < 12 ? "Good morning" : currentHour < 18 ? "Good afternoon" : "Good evening";
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -40,15 +53,16 @@ export function AIChat() {
     return context;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, customMessage?: string) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    const messageToSend = customMessage || input.trim();
+    if (!messageToSend || isLoading) return;
 
     const userMessage: ChatMessage = {
       id: generateId(),
       user_id: '',
       role: 'user',
-      content: input.trim(),
+      content: messageToSend,
       context: getCurrentContext(),
       created_at: new Date().toISOString(),
     };
@@ -64,14 +78,21 @@ export function AIChat() {
         body: JSON.stringify({
           message: userMessage.content,
           context: getCurrentContext(),
-          goals: goals.map(g => ({
-            description: g.description,
-            category: g.category,
-            status: g.status,
-            progress: `${g.kpi_current}/${g.kpi_target}`,
-          })),
+          goals: goals
+            .filter(g => g.status === 'active')
+            .map(g => ({
+              objective: g.objective,
+              why: g.why,
+              category: g.category,
+              progress: g.success_measures.length > 0
+                ? `${Math.round(g.success_measures.reduce((acc, m) => acc + (m.current / m.target), 0) / g.success_measures.length * 100)}%`
+                : 'No measures',
+              pendingActions: g.actions.filter(a => a.status === 'pending' || a.status === 'scheduled').length,
+            })),
           antiGoals: antiGoals.map(a => a.description),
           currentVibe: currentVibeCode?.vibe_type,
+          energyLevel: todayContext?.energy_level,
+          journalEntries: journalEntries.slice(-5),
           chatHistory: chatMessages.slice(-10).map(m => ({
             role: m.role,
             content: m.content,
@@ -113,16 +134,21 @@ export function AIChat() {
     }
   };
 
+  const handleQuickPrompt = (text: string) => {
+    const syntheticEvent = { preventDefault: () => {} } as React.FormEvent;
+    handleSubmit(syntheticEvent, text);
+  };
+
   if (isChatMinimized) {
     return (
       <div className="w-16 bg-white border-l border-warm-200 flex flex-col items-center py-4">
         <button
           onClick={toggleChat}
-          className="p-3 bg-accent-100 text-accent-700 rounded-full hover:bg-accent-200"
+          className="p-3 bg-accent-100 text-accent-700 rounded-full hover:bg-accent-200 transition-colors"
         >
           <Maximize2 className="w-5 h-5" />
         </button>
-        <span className="mt-2 text-xs text-warm-500 writing-mode-vertical">Chat</span>
+        <span className="mt-2 text-xs text-warm-500 [writing-mode:vertical-lr]">Chat</span>
       </div>
     );
   }
@@ -130,14 +156,19 @@ export function AIChat() {
   return (
     <div className="w-80 bg-white border-l border-warm-200 flex flex-col h-screen">
       {/* Header */}
-      <div className="p-4 border-b border-warm-100 flex items-center justify-between">
-        <div>
-          <h2 className="font-semibold text-warm-900">Your Guide</h2>
-          <p className="text-xs text-warm-500 italic">Here to help you stay on track</p>
+      <div className="p-4 border-b border-warm-100 flex items-center justify-between bg-gradient-to-r from-accent-50 to-warm-50">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-white rounded-xl shadow-sm">
+            <Sparkles className="w-5 h-5 text-accent-500" />
+          </div>
+          <div>
+            <h2 className="font-semibold text-warm-900">Your Guide</h2>
+            <p className="text-xs text-warm-500">Reflection & Planning</p>
+          </div>
         </div>
         <button
           onClick={toggleChat}
-          className="p-2 hover:bg-warm-100 rounded-lg"
+          className="p-2 hover:bg-white/50 rounded-lg transition-colors"
         >
           <Minimize2 className="w-4 h-4 text-warm-500" />
         </button>
@@ -146,9 +177,22 @@ export function AIChat() {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-warm-50">
         {chatMessages.length === 0 && (
-          <div className="text-center text-warm-600 py-8">
-            <p className="mb-2 font-medium">Hey! How's your energy today?</p>
-            <p className="text-sm text-warm-500">I'm here to help you stay focused and track your progress.</p>
+          <div className="text-center py-6">
+            <p className="text-warm-800 font-medium mb-2">{greeting}!</p>
+            <p className="text-sm text-warm-500 mb-4">
+              I'm here to help you reflect, plan, and stay on track.
+            </p>
+            <div className="space-y-2">
+              {quickPrompts.map((prompt) => (
+                <button
+                  key={prompt.label}
+                  onClick={() => handleQuickPrompt(prompt.text)}
+                  className="block w-full px-4 py-2.5 bg-white border border-warm-200 rounded-xl text-sm text-warm-700 hover:border-accent-300 hover:bg-accent-50 transition-colors text-left"
+                >
+                  {prompt.label}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -165,17 +209,17 @@ export function AIChat() {
                 'max-w-[85%] rounded-2xl px-4 py-2.5',
                 message.role === 'user'
                   ? 'bg-accent-500 text-white'
-                  : 'bg-white text-warm-800 border border-warm-200'
+                  : 'bg-white text-warm-800 border border-warm-200 shadow-sm'
               )}
             >
-              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
             </div>
           </div>
         ))}
 
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-white border border-warm-200 rounded-2xl px-4 py-2.5">
+            <div className="bg-white border border-warm-200 rounded-2xl px-4 py-2.5 shadow-sm">
               <Loader2 className="w-5 h-5 text-accent-500 animate-spin" />
             </div>
           </div>
@@ -183,6 +227,24 @@ export function AIChat() {
 
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Quick prompts when there are messages */}
+      {chatMessages.length > 0 && chatMessages.length < 6 && (
+        <div className="px-4 py-2 border-t border-warm-100 bg-white">
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {quickPrompts.slice(0, 3).map((prompt) => (
+              <button
+                key={prompt.label}
+                onClick={() => handleQuickPrompt(prompt.text)}
+                disabled={isLoading}
+                className="px-3 py-1.5 bg-warm-50 border border-warm-200 rounded-full text-xs text-warm-600 hover:bg-accent-50 hover:border-accent-200 transition-colors whitespace-nowrap flex-shrink-0"
+              >
+                {prompt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Input */}
       <form onSubmit={handleSubmit} className="p-4 border-t border-warm-100 bg-white">
@@ -192,7 +254,7 @@ export function AIChat() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Share your progress, doubts, or feelings..."
+            placeholder="Share your thoughts..."
             rows={1}
             className="flex-1 px-4 py-2.5 bg-warm-50 border border-warm-200 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-transparent text-sm max-h-32"
             style={{ minHeight: '44px' }}
