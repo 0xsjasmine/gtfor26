@@ -23,11 +23,11 @@ const focusViews: { id: FocusView; label: string }[] = [
 ];
 
 const energyLevels: { value: EnergyLevel; label: string; color: string }[] = [
-  { value: 1, label: 'Depleted', color: 'bg-accent-400' },
-  { value: 2, label: 'Low', color: 'bg-accent-300' },
-  { value: 3, label: 'Moderate', color: 'bg-warm-400' },
-  { value: 4, label: 'Good', color: 'bg-sage-400' },
-  { value: 5, label: 'Peak', color: 'bg-sage-500' },
+  { value: 1, label: 'Recharging', color: 'bg-accent-400' },
+  { value: 2, label: 'Low Vibe', color: 'bg-accent-300' },
+  { value: 3, label: 'Rising', color: 'bg-warm-400' },
+  { value: 4, label: 'Aligned', color: 'bg-sage-400' },
+  { value: 5, label: 'In My Power', color: 'bg-sage-500' },
 ];
 
 export function FocusContent() {

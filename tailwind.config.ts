@@ -55,24 +55,18 @@ const config: Config = {
         }
       },
       fontFamily: {
-        // Timeless, elegant system font stacks
+        // Clean, simple sans-serif
         sans: [
-          'Avenir Next',
-          'Avenir',
-          '-apple-system',
-          'BlinkMacSystemFont',
-          'Segoe UI',
+          'Arial',
           'Helvetica Neue',
           'Helvetica',
           'sans-serif',
         ],
         serif: [
-          'Garamond',
-          'Baskerville',
-          'Georgia',
-          'Cambria',
-          'Times New Roman',
-          'serif',
+          'Arial',
+          'Helvetica Neue',
+          'Helvetica',
+          'sans-serif',
         ],
       },
     },
