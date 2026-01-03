@@ -143,10 +143,13 @@ export function FocusContent() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            {!isToday && focusView === 'day' && (
+            {!isToday && (
               <button
-                onClick={goToToday}
-                className="px-3 py-1.5 text-sm bg-cream-200 text-neutral-700 rounded-lg hover:bg-cream-300"
+                onClick={() => {
+                  setSelectedDate(today);
+                  setFocusView('day');
+                }}
+                className="px-4 py-2 text-sm bg-primary-100 text-primary-600 font-medium rounded-xl hover:bg-primary-200 transition-colors"
               >
                 Today
               </button>

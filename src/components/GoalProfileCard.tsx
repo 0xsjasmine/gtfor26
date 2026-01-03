@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { cn, getCategoryIcon, generateId } from '@/lib/utils';
+import { cn, generateId } from '@/lib/utils';
 import { useAppStore } from '@/store/app-store';
 import type { Goal, GoalCategory, SuccessMeasure } from '@/types';
 import {
@@ -12,9 +12,6 @@ import {
   MoreHorizontal,
   Archive,
   Trash2,
-  Target,
-  Sparkles,
-  TrendingUp,
 } from 'lucide-react';
 
 interface GoalProfileCardProps {
@@ -54,7 +51,6 @@ export function GoalProfileCard({
     addSuccessMeasure,
   } = useAppStore();
 
-  // Editable state
   const [objective, setObjective] = useState(goal?.objective || '');
   const [category, setCategory] = useState<GoalCategory>(goal?.category || 'work');
   const [measures, setMeasures] = useState<SuccessMeasure[]>(goal?.success_measures || []);
@@ -119,39 +115,38 @@ export function GoalProfileCard({
     onSave?.(newGoal);
   };
 
-  // Calculate how many milestone slots to show (minimum 3, expand as needed)
-  const milestoneSlots = Math.max(3, displayMeasures.length + 1);
-  const emptySlots = milestoneSlots - displayMeasures.length;
+  const emptySlots = Math.max(0, 3 - displayMeasures.length);
 
   return (
     <div className="relative">
-      {/* Side Navigation */}
+      {/* Side Navigation - only show when multiple goals */}
       {!isNew && totalGoals > 1 && (
         <>
           <button
             onClick={onPrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 p-2 rounded-full bg-white border border-neutral-200 shadow-md hover:bg-neutral-50 transition-all z-10"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-8 p-3 rounded-full bg-cream-50 border border-cream-300 shadow-sm hover:bg-cream-100 transition-all z-10"
           >
-            <ChevronLeft className="w-5 h-5 text-neutral-600" />
+            <ChevronLeft className="w-5 h-5 text-neutral-500" />
           </button>
           <button
             onClick={onNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 p-2 rounded-full bg-white border border-neutral-200 shadow-md hover:bg-neutral-50 transition-all z-10"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-8 p-3 rounded-full bg-cream-50 border border-cream-300 shadow-sm hover:bg-cream-100 transition-all z-10"
           >
-            <ChevronRight className="w-5 h-5 text-neutral-600" />
+            <ChevronRight className="w-5 h-5 text-neutral-500" />
           </button>
         </>
       )}
 
-      {/* Top Row: Objective + Type */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-4">
-        {/* OBJECTIVE Card - Left (larger) */}
-        <div className="lg:col-span-3 bg-cream-50 rounded-2xl border border-cream-200 p-6 relative min-h-[140px]">
+      {/* Main Card Container */}
+      <div className="space-y-6">
+
+        {/* OBJECTIVE Card - Full width, clean */}
+        <div className="bg-cream-50 rounded-2xl border border-cream-200 p-8 relative">
           {/* Menu */}
-          <div className="absolute top-4 right-4">
+          <div className="absolute top-6 right-6">
             {isNew ? (
               onCancel && (
-                <button onClick={onCancel} className="text-neutral-400 hover:text-neutral-600">
+                <button onClick={onCancel} className="text-neutral-400 hover:text-neutral-600 transition-colors">
                   <Plus className="w-5 h-5 rotate-45" />
                 </button>
               )
@@ -159,21 +154,21 @@ export function GoalProfileCard({
               <div className="relative">
                 <button
                   onClick={() => setShowMenu(!showMenu)}
-                  className="p-1.5 hover:bg-neutral-100 rounded-lg"
+                  className="p-2 hover:bg-cream-200 rounded-lg transition-colors"
                 >
                   <MoreHorizontal className="w-5 h-5 text-neutral-400" />
                 </button>
                 {showMenu && goal && (
-                  <div className="absolute right-0 top-8 w-36 bg-white border border-neutral-200 rounded-xl shadow-lg py-1 z-20">
+                  <div className="absolute right-0 top-10 w-36 bg-white border border-cream-200 rounded-xl shadow-lg py-1 z-20">
                     <button
                       onClick={() => { updateGoal(goal.id, { status: 'backlogged' }); setShowMenu(false); }}
-                      className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-cream-50 flex items-center gap-2 text-neutral-600"
                     >
                       <Archive className="w-4 h-4" /> Backlog
                     </button>
                     <button
                       onClick={() => { deleteGoal(goal.id); setShowMenu(false); }}
-                      className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2 text-primary-500"
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-cream-50 flex items-center gap-2 text-primary-500"
                     >
                       <Trash2 className="w-4 h-4" /> Delete
                     </button>
@@ -183,232 +178,214 @@ export function GoalProfileCard({
             )}
           </div>
 
-          {/* Label */}
-          <div className="flex items-center gap-2 mb-4">
-            <Target className="w-4 h-4 text-primary-400" />
-            <span className="text-xs font-semibold text-primary-400 uppercase tracking-wide">Objective</span>
-          </div>
-
-          {/* Category Icon + Objective Input */}
-          <div className="flex items-start gap-4">
-            <div className="text-4xl">{getCategoryIcon(category)}</div>
-            <div className="flex-1">
-              {isNew ? (
-                <input
-                  type="text"
-                  placeholder="What's your intention?"
-                  value={objective}
-                  onChange={(e) => setObjective(e.target.value)}
-                  className="w-full text-xl font-semibold text-neutral-900 bg-transparent border-none focus:outline-none placeholder:text-neutral-400"
-                />
-              ) : (
-                <h1 className="text-xl font-semibold text-neutral-900">{goal?.objective}</h1>
-              )}
-            </div>
+          {/* Objective Input - Clean, no icon */}
+          <div className="max-w-2xl">
+            {isNew ? (
+              <input
+                type="text"
+                placeholder="What's your intention?"
+                value={objective}
+                onChange={(e) => setObjective(e.target.value)}
+                className="w-full text-2xl font-serif text-neutral-800 bg-transparent border-none focus:outline-none placeholder:text-neutral-400"
+              />
+            ) : (
+              <h1 className="text-2xl font-serif text-neutral-800">{goal?.objective}</h1>
+            )}
           </div>
 
           {/* Counter */}
           {!isNew && totalGoals > 1 && (
-            <p className="text-xs text-neutral-400 mt-4">{currentIndex + 1} / {totalGoals}</p>
+            <p className="text-sm text-neutral-400 mt-6">{currentIndex + 1} of {totalGoals}</p>
           )}
         </div>
 
-        {/* TYPE Card - Right (smaller) */}
-        <div className="lg:col-span-2 bg-cream-50 rounded-2xl border border-cream-200 p-5">
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="w-4 h-4 text-primary-400" />
-            <span className="text-xs font-semibold text-primary-400 uppercase tracking-wide">Type</span>
-          </div>
+        {/* TYPE Card */}
+        <div className="bg-cream-50 rounded-2xl border border-cream-200 p-6">
+          <p className="text-xs font-semibold text-primary-400 uppercase tracking-wider mb-4">Type</p>
           {isNew ? (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3">
               {categories.map((cat) => (
                 <button
                   key={cat.id}
                   onClick={() => setCategory(cat.id)}
                   className={cn(
-                    "px-3 py-1.5 rounded-full text-sm font-medium transition-colors border",
+                    "px-4 py-2 rounded-full text-sm font-medium transition-all border",
                     category === cat.id
-                      ? "border-primary-400 text-primary-500 bg-primary-50"
-                      : "border-cream-300 text-neutral-600 hover:border-cream-400"
+                      ? "border-primary-400 text-primary-600 bg-primary-50"
+                      : "border-cream-300 text-neutral-500 hover:border-cream-400 hover:text-neutral-600"
                   )}
                 >
-                  {getCategoryIcon(cat.id)} {cat.label}
+                  {cat.label}
                 </button>
               ))}
             </div>
           ) : (
             <p className="text-neutral-700 font-medium">
-              {getCategoryIcon(category)} {category.charAt(0).toUpperCase() + category.slice(1)}
+              {category.charAt(0).toUpperCase() + category.slice(1)}
             </p>
           )}
         </div>
-      </div>
 
-      {/* Middle Row: Milestones Grid */}
-      <div className="mb-4">
-        <div className="flex items-center gap-2 mb-3">
-          <TrendingUp className="w-4 h-4 text-primary-400" />
-          <span className="text-xs font-semibold text-primary-400 uppercase tracking-wide">Milestones</span>
+        {/* MILESTONES Section */}
+        <div>
+          <p className="text-xs font-semibold text-primary-400 uppercase tracking-wider mb-4">Milestones</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Existing Milestones */}
+            {displayMeasures.map((measure) => {
+              const isComplete = measure.current >= measure.target;
+              return (
+                <div
+                  key={measure.id}
+                  className={cn(
+                    "bg-cream-50 rounded-2xl border p-5 relative group cursor-pointer transition-all min-h-[120px]",
+                    isComplete
+                      ? "border-primary-300 bg-primary-50"
+                      : "border-cream-200 hover:border-primary-200"
+                  )}
+                  onClick={() => toggleMilestone(measure.id)}
+                >
+                  {/* Checkbox */}
+                  <div className={cn(
+                    "absolute top-4 right-4 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors",
+                    isComplete
+                      ? "bg-primary-400 border-primary-400"
+                      : "border-cream-400"
+                  )}>
+                    {isComplete && <Check className="w-4 h-4 text-white" />}
+                  </div>
+
+                  {/* Milestone Text */}
+                  <p className={cn(
+                    "text-sm font-medium pr-8 leading-relaxed",
+                    isComplete ? "text-neutral-500 line-through" : "text-neutral-700"
+                  )}>
+                    {measure.metric}
+                  </p>
+
+                  {/* Remove button */}
+                  {isNew && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); removeMeasure(measure.id); }}
+                      className="absolute bottom-4 right-4 text-neutral-400 hover:text-primary-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+
+            {/* Add Milestone Cards */}
+            {Array.from({ length: Math.min(emptySlots, isNew ? 3 - displayMeasures.length : 1) }).map((_, i) => (
+              editingMilestone === `new-${i}` ? (
+                <div
+                  key={`add-${i}`}
+                  className="bg-cream-50 rounded-2xl border-2 border-dashed border-primary-300 p-5 min-h-[120px]"
+                >
+                  <input
+                    type="text"
+                    placeholder="What will you achieve?"
+                    value={newMeasureName}
+                    onChange={(e) => setNewMeasureName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleAddMeasure();
+                      if (e.key === 'Escape') { setEditingMilestone(null); setNewMeasureName(''); }
+                    }}
+                    onBlur={() => {
+                      if (newMeasureName.trim()) handleAddMeasure();
+                      else { setEditingMilestone(null); setNewMeasureName(''); }
+                    }}
+                    className="w-full text-sm text-neutral-700 bg-transparent border-none focus:outline-none placeholder:text-neutral-400"
+                    autoFocus
+                  />
+                </div>
+              ) : (
+                <button
+                  key={`add-${i}`}
+                  onClick={() => setEditingMilestone(`new-${i}`)}
+                  className="bg-cream-50 rounded-2xl border-2 border-dashed border-cream-300 p-5 min-h-[120px] flex items-center justify-center text-neutral-400 hover:border-primary-300 hover:text-primary-400 transition-colors"
+                >
+                  <Plus className="w-6 h-6" />
+                </button>
+              )
+            ))}
+
+            {/* Extra "+" for existing goals */}
+            {!isNew && displayMeasures.length >= 3 && (
+              editingMilestone === 'extra' ? (
+                <div className="bg-cream-50 rounded-2xl border-2 border-dashed border-primary-300 p-5 min-h-[120px]">
+                  <input
+                    type="text"
+                    placeholder="What will you achieve?"
+                    value={newMeasureName}
+                    onChange={(e) => setNewMeasureName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleAddMeasure();
+                      if (e.key === 'Escape') { setEditingMilestone(null); setNewMeasureName(''); }
+                    }}
+                    onBlur={() => {
+                      if (newMeasureName.trim()) handleAddMeasure();
+                      else { setEditingMilestone(null); setNewMeasureName(''); }
+                    }}
+                    className="w-full text-sm text-neutral-700 bg-transparent border-none focus:outline-none placeholder:text-neutral-400"
+                    autoFocus
+                  />
+                </div>
+              ) : (
+                <button
+                  onClick={() => setEditingMilestone('extra')}
+                  className="bg-cream-50 rounded-2xl border-2 border-dashed border-cream-300 p-5 min-h-[120px] flex items-center justify-center text-neutral-400 hover:border-primary-300 hover:text-primary-400 transition-colors"
+                >
+                  <Plus className="w-6 h-6" />
+                </button>
+              )
+            )}
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          {/* Existing Milestones */}
-          {displayMeasures.map((measure) => {
-            const isComplete = measure.current >= measure.target;
-            return (
-              <div
-                key={measure.id}
-                className={cn(
-                  "bg-cream-50 rounded-xl border p-4 relative group cursor-pointer transition-all min-h-[100px]",
-                  isComplete
-                    ? "border-primary-300 bg-primary-50"
-                    : "border-cream-200 hover:border-primary-300"
-                )}
-                onClick={() => toggleMilestone(measure.id)}
-              >
-                {/* Checkbox */}
-                <div className={cn(
-                  "absolute top-3 right-3 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors",
-                  isComplete
-                    ? "bg-primary-400 border-primary-400"
-                    : "border-cream-400"
-                )}>
-                  {isComplete && <Check className="w-3 h-3 text-white" />}
-                </div>
-
-                {/* Milestone Text */}
-                <p className={cn(
-                  "text-sm font-medium pr-6",
-                  isComplete ? "text-neutral-500 line-through" : "text-neutral-700"
-                )}>
-                  {measure.metric}
-                </p>
-
-                {/* Remove button (only for new goals) */}
-                {isNew && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); removeMeasure(measure.id); }}
-                    className="absolute bottom-3 right-3 text-neutral-400 hover:text-primary-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-            );
-          })}
-
-          {/* Add Milestone Card(s) - Show empty slots */}
-          {Array.from({ length: Math.min(emptySlots, isNew ? 3 - displayMeasures.length : 1) }).map((_, i) => (
-            editingMilestone === `new-${i}` ? (
-              <div
-                key={`add-${i}`}
-                className="bg-cream-50 rounded-xl border-2 border-dashed border-primary-300 p-4 min-h-[100px]"
-              >
-                <input
-                  type="text"
-                  placeholder="Milestone..."
-                  value={newMeasureName}
-                  onChange={(e) => setNewMeasureName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleAddMeasure();
-                    if (e.key === 'Escape') { setEditingMilestone(null); setNewMeasureName(''); }
-                  }}
-                  onBlur={() => {
-                    if (newMeasureName.trim()) handleAddMeasure();
-                    else { setEditingMilestone(null); setNewMeasureName(''); }
-                  }}
-                  className="w-full text-sm text-neutral-700 bg-transparent border-none focus:outline-none placeholder:text-neutral-400"
-                  autoFocus
-                />
-              </div>
-            ) : (
-              <button
-                key={`add-${i}`}
-                onClick={() => setEditingMilestone(`new-${i}`)}
-                className="bg-cream-50 rounded-xl border-2 border-dashed border-cream-300 p-4 min-h-[100px] flex items-center justify-center text-neutral-400 hover:border-primary-300 hover:text-primary-400 transition-colors"
-              >
-                <Plus className="w-6 h-6" />
-              </button>
-            )
-          ))}
-
-          {/* Extra "+" button if all slots filled */}
-          {displayMeasures.length >= 3 && !isNew && (
-            editingMilestone === 'extra' ? (
-              <div className="bg-cream-50 rounded-xl border-2 border-dashed border-primary-300 p-4 min-h-[100px]">
-                <input
-                  type="text"
-                  placeholder="Milestone..."
-                  value={newMeasureName}
-                  onChange={(e) => setNewMeasureName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleAddMeasure();
-                    if (e.key === 'Escape') { setEditingMilestone(null); setNewMeasureName(''); }
-                  }}
-                  onBlur={() => {
-                    if (newMeasureName.trim()) handleAddMeasure();
-                    else { setEditingMilestone(null); setNewMeasureName(''); }
-                  }}
-                  className="w-full text-sm text-neutral-700 bg-transparent border-none focus:outline-none placeholder:text-neutral-400"
-                  autoFocus
-                />
-              </div>
-            ) : (
-              <button
-                onClick={() => setEditingMilestone('extra')}
-                className="bg-cream-50 rounded-xl border-2 border-dashed border-cream-300 p-4 min-h-[100px] flex items-center justify-center text-neutral-400 hover:border-primary-300 hover:text-primary-400 transition-colors"
-              >
-                <Plus className="w-6 h-6" />
-              </button>
-            )
+        {/* BONUS WINS Card */}
+        <div className="bg-cream-50 rounded-2xl border border-cream-200 p-6">
+          <p className="text-xs font-semibold text-primary-400 uppercase tracking-wider mb-4">Bonus Wins</p>
+          {isNew ? (
+            <textarea
+              placeholder="Track unexpected positive outcomes..."
+              value={bonusWins}
+              onChange={(e) => setBonusWins(e.target.value)}
+              className="w-full text-sm text-neutral-700 bg-transparent border-none focus:outline-none resize-none placeholder:text-neutral-400 leading-relaxed"
+              rows={2}
+            />
+          ) : (
+            <p className="text-neutral-400 text-sm">Track unexpected positive outcomes...</p>
           )}
         </div>
-      </div>
 
-      {/* Bottom Row: Bonus Wins */}
-      <div className="bg-cream-50 rounded-2xl border border-cream-200 p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="w-4 h-4 text-primary-400" />
-          <span className="text-xs font-semibold text-primary-400 uppercase tracking-wide">Bonus Wins</span>
-        </div>
-        {isNew ? (
-          <textarea
-            placeholder="Track unexpected positive outcomes and ripple effects..."
-            value={bonusWins}
-            onChange={(e) => setBonusWins(e.target.value)}
-            className="w-full text-sm text-neutral-700 bg-transparent border-none focus:outline-none resize-none placeholder:text-neutral-400"
-            rows={2}
-          />
-        ) : (
-          <p className="text-neutral-400 text-sm">Track unexpected positive outcomes and ripple effects...</p>
+        {/* Save Button */}
+        {isNew && (
+          <button
+            onClick={handleSave}
+            disabled={!objective.trim()}
+            className="w-full py-4 bg-primary-400 text-white rounded-2xl hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-lg transition-colors"
+          >
+            Create Intention
+          </button>
+        )}
+
+        {/* Pagination Dots */}
+        {!isNew && totalGoals > 1 && (
+          <div className="flex justify-center gap-2 pt-4">
+            {Array.from({ length: totalGoals }).map((_, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "h-2 rounded-full transition-all",
+                  i === currentIndex ? "bg-primary-400 w-8" : "bg-cream-300 w-2"
+                )}
+              />
+            ))}
+          </div>
         )}
       </div>
-
-      {/* Save Button for New Goals */}
-      {isNew && (
-        <button
-          onClick={handleSave}
-          disabled={!objective.trim()}
-          className="w-full mt-6 py-4 bg-primary-400 text-white rounded-xl hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-lg"
-        >
-          Create Intention
-        </button>
-      )}
-
-      {/* Pagination Dots */}
-      {!isNew && totalGoals > 1 && (
-        <div className="flex justify-center gap-2 mt-6">
-          {Array.from({ length: totalGoals }).map((_, i) => (
-            <div
-              key={i}
-              className={cn(
-                "w-2 h-2 rounded-full transition-all",
-                i === currentIndex ? "bg-primary-400 w-6" : "bg-neutral-300"
-              )}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }

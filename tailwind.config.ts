@@ -9,18 +9,18 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Primary - Watermelon (accent on cream)
+        // Primary - Papier Blue (elegant periwinkle)
         primary: {
-          50: '#fff1f3',
-          100: '#ffe0e5',
-          200: '#ffc7d0',
-          300: '#ff9dae',
-          400: '#FF4F6F', // Main watermelon
-          500: '#f83a5c',
-          600: '#e51d47',
-          700: '#c1123a',
-          800: '#a01236',
-          900: '#881434',
+          50: '#F0F4FB',
+          100: '#E1E9F7',
+          200: '#C3D3EF',
+          300: '#9BB5E4',
+          400: '#6B8DD6', // Main Papier blue
+          500: '#4A6FC4',
+          600: '#3A5AA8',
+          700: '#2E478A',
+          800: '#273B71',
+          900: '#24345E',
         },
         // Cream - Papier-style backgrounds
         cream: {

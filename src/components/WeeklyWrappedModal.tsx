@@ -126,10 +126,10 @@ export function WeeklyWrappedModal({ isOpen, onClose, stats, onStartWeek }: Week
               {stats.milestonesCompleted > 0 && (
                 <p className="text-lg">
                   {stats.milestonesCompleted >= stats.totalMilestones
-                    ? "You crushed it! 🎉"
+                    ? "You crushed it!"
                     : stats.milestonesCompleted >= stats.totalMilestones / 2
-                    ? "Solid progress! Keep pushing 💪"
-                    : "Every step counts ✨"}
+                    ? "Solid progress. Keep pushing."
+                    : "Every step counts."}
                 </p>
               )}
             </div>
@@ -148,8 +148,8 @@ export function WeeklyWrappedModal({ isOpen, onClose, stats, onStartWeek }: Week
                   was when you were most focused
                 </p>
               </div>
-              <p className="text-lg">
-                Maybe lean into that energy this week? 🌟
+              <p className="text-lg text-white/80">
+                Maybe lean into that energy this week.
               </p>
             </div>
           )}
@@ -176,14 +176,14 @@ export function WeeklyWrappedModal({ isOpen, onClose, stats, onStartWeek }: Week
                   />
                 </div>
               </div>
-              <p className="text-lg">
+              <p className="text-lg text-white/80">
                 {stats.goalsProgress >= 75
-                  ? "You're in the home stretch!"
+                  ? "You're in the home stretch."
                   : stats.goalsProgress >= 50
-                  ? "Halfway there, keep going!"
+                  ? "Halfway there, keep going."
                   : stats.goalsProgress >= 25
-                  ? "Building momentum 🚀"
-                  : "Just getting started ✨"}
+                  ? "Building momentum."
+                  : "Just getting started."}
               </p>
             </div>
           )}
