@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Whatever It Takes',
-  description: 'An LLM-powered quarterly goal management platform',
+  title: 'All In',
+  description: 'Your personal goal journal',
 };
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased min-h-screen">
+      <body className="font-sans antialiased min-h-screen bg-cream-100">
         {children}
       </body>
     </html>

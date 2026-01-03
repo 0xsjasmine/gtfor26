@@ -146,7 +146,7 @@ export function GoalProfileCard({
       {/* Top Row: Objective + Type */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-4">
         {/* OBJECTIVE Card - Left (larger) */}
-        <div className="lg:col-span-3 bg-white rounded-xl border border-neutral-200 p-6 relative min-h-[140px]">
+        <div className="lg:col-span-3 bg-cream-50 rounded-2xl border border-cream-200 p-6 relative min-h-[140px]">
           {/* Menu */}
           <div className="absolute top-4 right-4">
             {isNew ? (
@@ -214,7 +214,7 @@ export function GoalProfileCard({
         </div>
 
         {/* TYPE Card - Right (smaller) */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-neutral-200 p-5">
+        <div className="lg:col-span-2 bg-cream-50 rounded-2xl border border-cream-200 p-5">
           <div className="flex items-center gap-2 mb-3">
             <Sparkles className="w-4 h-4 text-primary-400" />
             <span className="text-xs font-semibold text-primary-400 uppercase tracking-wide">Type</span>
@@ -229,7 +229,7 @@ export function GoalProfileCard({
                     "px-3 py-1.5 rounded-full text-sm font-medium transition-colors border",
                     category === cat.id
                       ? "border-primary-400 text-primary-500 bg-primary-50"
-                      : "border-neutral-200 text-neutral-600 hover:border-neutral-300"
+                      : "border-cream-300 text-neutral-600 hover:border-cream-400"
                   )}
                 >
                   {getCategoryIcon(cat.id)} {cat.label}
@@ -259,10 +259,10 @@ export function GoalProfileCard({
               <div
                 key={measure.id}
                 className={cn(
-                  "bg-white rounded-xl border p-4 relative group cursor-pointer transition-all min-h-[100px]",
+                  "bg-cream-50 rounded-xl border p-4 relative group cursor-pointer transition-all min-h-[100px]",
                   isComplete
                     ? "border-primary-300 bg-primary-50"
-                    : "border-neutral-200 hover:border-primary-300"
+                    : "border-cream-200 hover:border-primary-300"
                 )}
                 onClick={() => toggleMilestone(measure.id)}
               >
@@ -271,7 +271,7 @@ export function GoalProfileCard({
                   "absolute top-3 right-3 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors",
                   isComplete
                     ? "bg-primary-400 border-primary-400"
-                    : "border-neutral-300"
+                    : "border-cream-400"
                 )}>
                   {isComplete && <Check className="w-3 h-3 text-white" />}
                 </div>
@@ -302,7 +302,7 @@ export function GoalProfileCard({
             editingMilestone === `new-${i}` ? (
               <div
                 key={`add-${i}`}
-                className="bg-white rounded-xl border-2 border-dashed border-primary-300 p-4 min-h-[100px]"
+                className="bg-cream-50 rounded-xl border-2 border-dashed border-primary-300 p-4 min-h-[100px]"
               >
                 <input
                   type="text"
@@ -325,7 +325,7 @@ export function GoalProfileCard({
               <button
                 key={`add-${i}`}
                 onClick={() => setEditingMilestone(`new-${i}`)}
-                className="bg-white rounded-xl border-2 border-dashed border-neutral-200 p-4 min-h-[100px] flex items-center justify-center text-neutral-400 hover:border-primary-300 hover:text-primary-400 transition-colors"
+                className="bg-cream-50 rounded-xl border-2 border-dashed border-cream-300 p-4 min-h-[100px] flex items-center justify-center text-neutral-400 hover:border-primary-300 hover:text-primary-400 transition-colors"
               >
                 <Plus className="w-6 h-6" />
               </button>
@@ -335,7 +335,7 @@ export function GoalProfileCard({
           {/* Extra "+" button if all slots filled */}
           {displayMeasures.length >= 3 && !isNew && (
             editingMilestone === 'extra' ? (
-              <div className="bg-white rounded-xl border-2 border-dashed border-primary-300 p-4 min-h-[100px]">
+              <div className="bg-cream-50 rounded-xl border-2 border-dashed border-primary-300 p-4 min-h-[100px]">
                 <input
                   type="text"
                   placeholder="Milestone..."
@@ -356,7 +356,7 @@ export function GoalProfileCard({
             ) : (
               <button
                 onClick={() => setEditingMilestone('extra')}
-                className="bg-white rounded-xl border-2 border-dashed border-neutral-200 p-4 min-h-[100px] flex items-center justify-center text-neutral-400 hover:border-primary-300 hover:text-primary-400 transition-colors"
+                className="bg-cream-50 rounded-xl border-2 border-dashed border-cream-300 p-4 min-h-[100px] flex items-center justify-center text-neutral-400 hover:border-primary-300 hover:text-primary-400 transition-colors"
               >
                 <Plus className="w-6 h-6" />
               </button>
@@ -366,7 +366,7 @@ export function GoalProfileCard({
       </div>
 
       {/* Bottom Row: Bonus Wins */}
-      <div className="bg-white rounded-xl border border-neutral-200 p-5">
+      <div className="bg-cream-50 rounded-2xl border border-cream-200 p-5">
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="w-4 h-4 text-primary-400" />
           <span className="text-xs font-semibold text-primary-400 uppercase tracking-wide">Bonus Wins</span>

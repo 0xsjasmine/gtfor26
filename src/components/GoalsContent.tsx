@@ -54,24 +54,24 @@ export function GoalsContent() {
   };
 
   return (
-    <div className="h-full overflow-auto p-6 bg-neutral-50">
+    <div className="h-full overflow-auto p-6 bg-cream-100">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-neutral-900">Goals</h1>
+            <h1 className="font-serif text-3xl text-neutral-800">Intentions</h1>
             <p className="text-neutral-500">{quarter}</p>
           </div>
 
           {/* Tab Toggle */}
-          <div className="flex bg-white rounded-xl border border-neutral-200 p-1">
+          <div className="flex bg-cream-200 rounded-xl p-1">
             <button
               onClick={() => setActiveTab('intentions')}
               className={cn(
                 "px-4 py-2 text-sm font-medium rounded-lg transition-colors",
                 activeTab === 'intentions'
-                  ? "bg-neutral-900 text-white"
-                  : "text-neutral-600 hover:text-neutral-900"
+                  ? "bg-cream-50 text-neutral-800 shadow-sm"
+                  : "text-neutral-500 hover:text-neutral-700"
               )}
             >
               Intentions
@@ -81,8 +81,8 @@ export function GoalsContent() {
               className={cn(
                 "px-4 py-2 text-sm font-medium rounded-lg transition-colors",
                 activeTab === 'anti-goals'
-                  ? "bg-neutral-900 text-white"
-                  : "text-neutral-600 hover:text-neutral-900"
+                  ? "bg-cream-50 text-neutral-800 shadow-sm"
+                  : "text-neutral-500 hover:text-neutral-700"
               )}
             >
               Anti-Goals
@@ -112,7 +112,7 @@ export function GoalsContent() {
                 {/* Add another goal button */}
                 <button
                   onClick={() => setShowNewGoal(true)}
-                  className="w-full mt-6 p-4 border-2 border-dashed border-neutral-300 rounded-xl text-neutral-500 hover:border-primary-400 hover:text-primary-500 flex items-center justify-center gap-2 transition-colors"
+                  className="w-full mt-6 p-4 border-2 border-dashed border-cream-300 rounded-xl text-neutral-500 hover:border-primary-400 hover:text-primary-500 flex items-center justify-center gap-2 transition-colors"
                 >
                   <Plus className="w-5 h-5" />
                   Add Another Intention
@@ -130,7 +130,7 @@ export function GoalsContent() {
         {/* Anti-Goals Tab */}
         {activeTab === 'anti-goals' && (
           <div className="space-y-4">
-            <p className="text-neutral-600 italic mb-6">
+            <p className="text-neutral-500 font-serif italic mb-6">
               Who you're choosing NOT to become this quarter.
             </p>
 
@@ -140,7 +140,7 @@ export function GoalsContent() {
                 {antiGoals.map((antiGoal) => (
                   <div
                     key={antiGoal.id}
-                    className="flex items-center gap-4 p-4 bg-white rounded-xl border border-neutral-200 group"
+                    className="flex items-center gap-4 p-4 bg-cream-50 rounded-xl border border-cream-200 group"
                   >
                     <div className="w-2 h-2 rounded-full bg-primary-400 flex-shrink-0" />
                     <span className="flex-1 text-neutral-700">{antiGoal.description}</span>
@@ -159,13 +159,13 @@ export function GoalsContent() {
             {!showAddAntiGoal ? (
               <button
                 onClick={() => setShowAddAntiGoal(true)}
-                className="w-full p-4 border-2 border-dashed border-neutral-300 rounded-xl text-neutral-500 hover:border-primary-400 hover:text-primary-500 flex items-center justify-center gap-2 transition-colors"
+                className="w-full p-4 border-2 border-dashed border-cream-300 rounded-xl text-neutral-500 hover:border-primary-400 hover:text-primary-500 flex items-center justify-center gap-2 transition-colors"
               >
                 <Plus className="w-5 h-5" />
                 Add Anti-Goal
               </button>
             ) : (
-              <div className="p-4 bg-white rounded-xl border border-neutral-200">
+              <div className="p-5 bg-cream-50 rounded-xl border border-cream-200">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-medium text-neutral-800">New Anti-Goal</h3>
                   <button onClick={() => setShowAddAntiGoal(false)}>
@@ -178,7 +178,7 @@ export function GoalsContent() {
                   value={newAntiGoal}
                   onChange={(e) => setNewAntiGoal(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleAddAntiGoal()}
-                  className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 mb-3"
+                  className="w-full px-4 py-3 bg-white border border-cream-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400 mb-3"
                   autoFocus
                 />
                 <button

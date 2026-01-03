@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Primary - Watermelon
+        // Primary - Watermelon (accent on cream)
         primary: {
           50: '#fff1f3',
           100: '#ffe0e5',
@@ -22,26 +22,46 @@ const config: Config = {
           800: '#a01236',
           900: '#881434',
         },
-        // Neutral - Black to White
+        // Cream - Papier-style backgrounds
+        cream: {
+          50: '#FDFCFB',
+          100: '#FAF9F6',
+          200: '#F5F3EF',
+          300: '#EBE8E2',
+          400: '#DDD9D0',
+        },
+        // Neutral - Warm grays
         neutral: {
-          50: '#fafafa',
-          100: '#f5f5f5',
-          200: '#e5e5e5',
-          300: '#d4d4d4',
-          400: '#a3a3a3',
-          500: '#737373',
-          600: '#525252',
-          700: '#404040',
-          800: '#262626',
-          900: '#171717',
-          950: '#0a0a0a',
+          50: '#fafaf9',
+          100: '#f5f5f4',
+          200: '#e7e5e4',
+          300: '#d6d3d1',
+          400: '#a8a29e',
+          500: '#78716c',
+          600: '#57534e',
+          700: '#44403c',
+          800: '#292524',
+          900: '#1c1917',
+          950: '#0c0a09',
         },
       },
       fontFamily: {
+        // Elegant serif for headers - Papier style
+        serif: [
+          'Georgia',
+          'Cambria',
+          'Times New Roman',
+          'Times',
+          'serif',
+        ],
+        // Clean sans for body text
         sans: [
-          'Arial',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'Roboto',
           'Helvetica Neue',
-          'Helvetica',
+          'Arial',
           'sans-serif',
         ],
       },

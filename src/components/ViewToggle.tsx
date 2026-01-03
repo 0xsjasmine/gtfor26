@@ -10,16 +10,16 @@ interface ViewToggleProps<T extends string> {
 
 export function ViewToggle<T extends string>({ views, activeView, onChange }: ViewToggleProps<T>) {
   return (
-    <div className="inline-flex bg-neutral-100 rounded-lg p-1">
+    <div className="inline-flex bg-cream-200 rounded-xl p-1">
       {views.map((view) => (
         <button
           key={view.id}
           onClick={() => onChange(view.id)}
           className={cn(
-            'px-4 py-2 text-sm font-medium rounded-md transition-all',
+            'px-4 py-2 text-sm font-medium rounded-lg transition-all',
             activeView === view.id
-              ? 'bg-white text-neutral-900 shadow-sm'
-              : 'text-neutral-600 hover:text-neutral-800'
+              ? 'bg-cream-50 text-neutral-800 shadow-sm'
+              : 'text-neutral-500 hover:text-neutral-700'
           )}
         >
           {view.label}
