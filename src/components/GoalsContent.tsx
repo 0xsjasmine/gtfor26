@@ -2,41 +2,34 @@
 
 import { useState } from 'react';
 import { useAppStore } from '@/store/app-store';
-import { ViewToggle } from './ViewToggle';
 import { GoalProfileCard } from './GoalProfileCard';
-import { AntiGoalCard } from './AntiGoalCard';
-import { getCurrentQuarter, formatDate, getCategoryIcon, generateId } from '@/lib/utils';
-import type { GoalsView, Goal, AntiGoal } from '@/types';
-import { Plus, X } from 'lucide-react';
+import { getCurrentQuarter, generateId } from '@/lib/utils';
+import type { Goal, AntiGoal } from '@/types';
+import { Plus, X, Trash2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-const goalsViews: { id: GoalsView; label: string }[] = [
-  { id: 'quarter', label: 'Quarter' },
-  { id: 'month', label: 'Month' },
-  { id: 'backlog', label: 'Backlog' },
-];
+type GoalsTab = 'intentions' | 'anti-goals';
 
 export function GoalsContent() {
   const {
-    goalsView,
-    setGoalsView,
     goals,
     antiGoals,
     currentQuarter,
     addGoal,
     addAntiGoal,
+    deleteAntiGoal,
     currentGoalIndex,
     nextGoal,
     prevGoal,
-    updateGoal,
   } = useAppStore();
 
+  const [activeTab, setActiveTab] = useState<GoalsTab>('intentions');
   const [showNewGoal, setShowNewGoal] = useState(false);
   const [showAddAntiGoal, setShowAddAntiGoal] = useState(false);
   const [newAntiGoal, setNewAntiGoal] = useState('');
 
   const quarter = currentQuarter || getCurrentQuarter();
   const activeGoals = goals.filter((g) => g.status === 'active');
-  const backloggedGoals = goals.filter((g) => g.status === 'backlogged');
   const currentGoal = activeGoals[currentGoalIndex];
 
   const handleSaveGoal = (goal: Goal) => {
@@ -69,16 +62,37 @@ export function GoalsContent() {
             <h1 className="text-2xl font-bold text-neutral-900">Goals</h1>
             <p className="text-neutral-500">{quarter}</p>
           </div>
-          <ViewToggle
-            views={goalsViews}
-            activeView={goalsView}
-            onChange={setGoalsView}
-          />
+
+          {/* Tab Toggle */}
+          <div className="flex bg-white rounded-xl border border-neutral-200 p-1">
+            <button
+              onClick={() => setActiveTab('intentions')}
+              className={cn(
+                "px-4 py-2 text-sm font-medium rounded-lg transition-colors",
+                activeTab === 'intentions'
+                  ? "bg-neutral-900 text-white"
+                  : "text-neutral-600 hover:text-neutral-900"
+              )}
+            >
+              Intentions
+            </button>
+            <button
+              onClick={() => setActiveTab('anti-goals')}
+              className={cn(
+                "px-4 py-2 text-sm font-medium rounded-lg transition-colors",
+                activeTab === 'anti-goals'
+                  ? "bg-neutral-900 text-white"
+                  : "text-neutral-600 hover:text-neutral-900"
+              )}
+            >
+              Anti-Goals
+            </button>
+          </div>
         </div>
 
-        {goalsView === 'quarter' && (
+        {/* Intentions Tab */}
+        {activeTab === 'intentions' && (
           <>
-            {/* Show new goal bento card OR existing goals */}
             {showNewGoal ? (
               <GoalProfileCard
                 isNew
@@ -101,156 +115,82 @@ export function GoalsContent() {
                   className="w-full mt-6 p-4 border-2 border-dashed border-neutral-300 rounded-xl text-neutral-500 hover:border-primary-400 hover:text-primary-500 flex items-center justify-center gap-2 transition-colors"
                 >
                   <Plus className="w-5 h-5" />
-                  Add Another Goal
+                  Add Another Intention
                 </button>
               </>
             ) : (
-              /* No goals - show empty bento card ready to fill */
               <GoalProfileCard
                 isNew
                 onSave={handleSaveGoal}
               />
             )}
-
-            {/* Anti-Goals Section */}
-            <div className="mt-10">
-              <h2 className="text-lg font-semibold text-neutral-800 mb-2">Anti-Goals</h2>
-              <p className="text-sm text-neutral-500 mb-4">Who you're choosing NOT to become this quarter.</p>
-
-              {antiGoals.length > 0 && (
-                <div className="space-y-3 mb-4">
-                  {antiGoals.map((antiGoal) => (
-                    <AntiGoalCard key={antiGoal.id} antiGoal={antiGoal} />
-                  ))}
-                </div>
-              )}
-
-              {!showAddAntiGoal ? (
-                <button
-                  onClick={() => setShowAddAntiGoal(true)}
-                  className="w-full p-4 border-2 border-dashed border-primary-200 rounded-xl text-primary-400 hover:border-primary-400 hover:text-primary-500 flex items-center justify-center gap-2"
-                >
-                  <Plus className="w-5 h-5" />
-                  Add Anti-Goal
-                </button>
-              ) : (
-                <div className="p-4 bg-primary-50 rounded-xl border border-primary-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-medium text-primary-700">New Anti-Goal</h3>
-                    <button onClick={() => setShowAddAntiGoal(false)}>
-                      <X className="w-5 h-5 text-primary-400" />
-                    </button>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder='e.g., "Not the person who says yes to everything"'
-                    value={newAntiGoal}
-                    onChange={(e) => setNewAntiGoal(e.target.value)}
-                    className="w-full px-4 py-3 border border-primary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 mb-3"
-                  />
-                  <button
-                    onClick={handleAddAntiGoal}
-                    className="w-full py-2 bg-primary-400 text-white rounded-xl hover:bg-primary-500"
-                  >
-                    Add Anti-Goal
-                  </button>
-                </div>
-              )}
-            </div>
           </>
         )}
 
-        {goalsView === 'month' && (
-          <>
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold text-neutral-800 mb-3">
-                {formatDate(new Date(), 'MMMM yyyy')} Focus
-              </h2>
-              {activeGoals.length > 0 ? (
-                <div className="space-y-4">
-                  {activeGoals.map((goal) => (
-                    <div
-                      key={goal.id}
-                      className="bg-white rounded-xl border border-neutral-200 p-5"
-                    >
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <span className="text-xs text-neutral-500">
-                            {getCategoryIcon(goal.category)} {goal.category}
-                          </span>
-                          <h3 className="font-medium text-neutral-800 mt-1">{goal.objective}</h3>
-                        </div>
-                        <span className="text-sm font-medium text-primary-500">
-                          {goal.actions.filter(a => a.status === 'done').length}/{goal.actions.length} done
-                        </span>
-                      </div>
-                      {goal.actions.length > 0 && (
-                        <div className="space-y-2">
-                          {goal.actions.slice(0, 3).map((action) => (
-                            <div
-                              key={action.id}
-                              className="flex items-center gap-2 text-sm text-neutral-600"
-                            >
-                              <span className={action.status === 'done' ? 'line-through opacity-50' : ''}>
-                                • {action.text}
-                              </span>
-                            </div>
-                          ))}
-                          {goal.actions.length > 3 && (
-                            <p className="text-xs text-neutral-400">+{goal.actions.length - 3} more actions</p>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-neutral-500 text-center py-8">No active goals this month.</p>
-              )}
-            </div>
-          </>
-        )}
-
-        {goalsView === 'backlog' && (
-          <>
-            <p className="text-neutral-600 mb-6 italic">
-              Items you've consciously deprioritized. Later, not never.
+        {/* Anti-Goals Tab */}
+        {activeTab === 'anti-goals' && (
+          <div className="space-y-4">
+            <p className="text-neutral-600 italic mb-6">
+              Who you're choosing NOT to become this quarter.
             </p>
 
-            {backloggedGoals.length > 0 ? (
-              <div className="space-y-4">
-                {backloggedGoals.map((goal) => (
+            {/* Anti-Goals List */}
+            {antiGoals.length > 0 && (
+              <div className="space-y-3">
+                {antiGoals.map((antiGoal) => (
                   <div
-                    key={goal.id}
-                    className="bg-white rounded-xl border border-neutral-200 p-5 opacity-75"
+                    key={antiGoal.id}
+                    className="flex items-center gap-4 p-4 bg-white rounded-xl border border-neutral-200 group"
                   >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <span className="text-xs text-neutral-400">
-                          {getCategoryIcon(goal.category)} {goal.category}
-                        </span>
-                        <h3 className="font-medium text-neutral-700 mt-1">{goal.objective}</h3>
-                        {goal.why && (
-                          <p className="text-sm text-neutral-500 mt-1 italic">{goal.why}</p>
-                        )}
-                      </div>
-                      <button
-                        onClick={() => updateGoal(goal.id, { status: 'active' })}
-                        className="px-3 py-1 text-sm bg-primary-100 text-primary-600 rounded-lg hover:bg-primary-200"
-                      >
-                        Reactivate
-                      </button>
-                    </div>
+                    <div className="w-2 h-2 rounded-full bg-primary-400 flex-shrink-0" />
+                    <span className="flex-1 text-neutral-700">{antiGoal.description}</span>
+                    <button
+                      onClick={() => deleteAntiGoal(antiGoal.id)}
+                      className="p-2 text-neutral-400 hover:text-primary-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 ))}
               </div>
+            )}
+
+            {/* Add Anti-Goal */}
+            {!showAddAntiGoal ? (
+              <button
+                onClick={() => setShowAddAntiGoal(true)}
+                className="w-full p-4 border-2 border-dashed border-neutral-300 rounded-xl text-neutral-500 hover:border-primary-400 hover:text-primary-500 flex items-center justify-center gap-2 transition-colors"
+              >
+                <Plus className="w-5 h-5" />
+                Add Anti-Goal
+              </button>
             ) : (
-              <div className="text-center py-12 text-neutral-500 bg-white rounded-xl border border-neutral-200">
-                <p>No backlogged items yet.</p>
-                <p className="text-sm mt-1">Items you deprioritize will appear here.</p>
+              <div className="p-4 bg-white rounded-xl border border-neutral-200">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-medium text-neutral-800">New Anti-Goal</h3>
+                  <button onClick={() => setShowAddAntiGoal(false)}>
+                    <X className="w-5 h-5 text-neutral-400 hover:text-neutral-600" />
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  placeholder='e.g., "Not the person who says yes to everything"'
+                  value={newAntiGoal}
+                  onChange={(e) => setNewAntiGoal(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddAntiGoal()}
+                  className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 mb-3"
+                  autoFocus
+                />
+                <button
+                  onClick={handleAddAntiGoal}
+                  disabled={!newAntiGoal.trim()}
+                  className="w-full py-3 bg-primary-400 text-white rounded-xl hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                >
+                  Add Anti-Goal
+                </button>
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>
