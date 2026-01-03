@@ -64,7 +64,6 @@ export function GoalProfileCard({
   const [category, setCategory] = useState<GoalCategory>(goal?.category || 'work');
   const [measures, setMeasures] = useState<SuccessMeasure[]>(goal?.success_measures || []);
   const [newMeasureName, setNewMeasureName] = useState('');
-  const [newMeasureTarget, setNewMeasureTarget] = useState(10);
   const [showAddMeasure, setShowAddMeasure] = useState(false);
   const [showAddAction, setShowAddAction] = useState(false);
   const [newActionText, setNewActionText] = useState('');
@@ -80,7 +79,7 @@ export function GoalProfileCard({
     const newMeasure: SuccessMeasure = {
       id: generateId(),
       metric: newMeasureName.trim(),
-      target: newMeasureTarget,
+      target: 1,
       current: 0,
     };
     if (isNew) {
@@ -89,8 +88,22 @@ export function GoalProfileCard({
       addSuccessMeasure(goal.id, newMeasure);
     }
     setNewMeasureName('');
-    setNewMeasureTarget(10);
     setShowAddMeasure(false);
+  };
+
+  const toggleMilestone = (measureId: string) => {
+    if (isNew) {
+      setMeasures(prev => prev.map(m =>
+        m.id === measureId
+          ? { ...m, current: m.current === 0 ? 1 : 0 }
+          : m
+      ));
+    } else if (goal) {
+      const measure = goal.success_measures.find(m => m.id === measureId);
+      if (measure) {
+        updateSuccessMeasure(goal.id, measureId, { current: measure.current === 0 ? 1 : 0 });
+      }
+    }
   };
 
   const handleAddAction = () => {
@@ -105,22 +118,6 @@ export function GoalProfileCard({
     addGoalAction(goal.id, action);
     setNewActionText('');
     setShowAddAction(false);
-  };
-
-  const incrementMeasure = (measureId: string, amount: number) => {
-    if (isNew) {
-      setMeasures(prev => prev.map(m =>
-        m.id === measureId
-          ? { ...m, current: Math.max(0, Math.min(m.target, m.current + amount)) }
-          : m
-      ));
-    } else if (goal) {
-      const measure = goal.success_measures.find(m => m.id === measureId);
-      if (measure) {
-        const newValue = Math.max(0, Math.min(measure.target, measure.current + amount));
-        updateSuccessMeasure(goal.id, measureId, { current: newValue });
-      }
-    }
   };
 
   const removeMeasure = (measureId: string) => {
@@ -286,99 +283,93 @@ export function GoalProfileCard({
         </div>
       </div>
 
-      {/* Full-Width Cards Below */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      {/* MILESTONES Section */}
+      <div className="bg-white rounded-xl border border-neutral-200 p-5 mt-4">
+        <div className="flex items-center gap-2 mb-4">
+          <TrendingUp className="w-4 h-4 text-primary-400" />
+          <span className="text-xs font-semibold text-primary-400 uppercase tracking-wide">Milestones</span>
+        </div>
 
-        {/* MILESTONES Cards */}
-        {displayMeasures.map((measure) => {
-          const progress = Math.round((measure.current / measure.target) * 100);
-          return (
-            <div key={measure.id} className="bg-white rounded-xl border border-neutral-200 p-5 relative">
-              {isNew && (
+        <div className="space-y-3">
+          {displayMeasures.map((measure) => {
+            const isComplete = measure.current >= measure.target;
+            return (
+              <div
+                key={measure.id}
+                className={cn(
+                  "flex items-center gap-3 p-3 rounded-lg transition-colors",
+                  isComplete ? "bg-primary-50" : "bg-neutral-50"
+                )}
+              >
                 <button
-                  onClick={() => removeMeasure(measure.id)}
-                  className="absolute top-3 right-3 text-neutral-400 hover:text-neutral-600"
+                  onClick={() => toggleMilestone(measure.id)}
+                  className={cn(
+                    "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors",
+                    isComplete
+                      ? "bg-primary-400 border-primary-400"
+                      : "border-neutral-300 hover:border-primary-400"
+                  )}
+                >
+                  {isComplete && <Check className="w-3 h-3 text-white" />}
+                </button>
+                <span className={cn(
+                  "flex-1 text-sm",
+                  isComplete ? "text-neutral-500 line-through" : "text-neutral-700"
+                )}>
+                  {measure.metric}
+                </span>
+                {isNew && (
+                  <button
+                    onClick={() => removeMeasure(measure.id)}
+                    className="text-neutral-400 hover:text-neutral-600 text-xs"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            );
+          })}
+
+          {/* Add Milestone Input */}
+          {(isNew || showAddMeasure) ? (
+            <div className="flex items-center gap-3 p-3 rounded-lg border-2 border-dashed border-neutral-200">
+              <div className="w-5 h-5 rounded-full border-2 border-neutral-200 flex-shrink-0" />
+              <input
+                type="text"
+                placeholder="Add a milestone..."
+                value={newMeasureName}
+                onChange={(e) => setNewMeasureName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddMeasure()}
+                className="flex-1 text-sm bg-transparent border-none focus:outline-none placeholder:text-neutral-400"
+                autoFocus={showAddMeasure}
+              />
+              {newMeasureName.trim() && (
+                <button
+                  onClick={handleAddMeasure}
+                  className="text-primary-400 hover:text-primary-500 text-sm font-medium"
+                >
+                  Add
+                </button>
+              )}
+              {!isNew && (
+                <button
+                  onClick={() => { setShowAddMeasure(false); setNewMeasureName(''); }}
+                  className="text-neutral-400 hover:text-neutral-600 text-xs"
                 >
                   ✕
                 </button>
               )}
-              <div className="flex items-center gap-2 mb-3">
-                <TrendingUp className="w-4 h-4 text-primary-400" />
-                <span className="text-xs font-semibold text-primary-400 uppercase tracking-wide">{measure.metric}</span>
-              </div>
-              <div className="flex items-end justify-between mb-3">
-                <div>
-                  <span className="text-3xl font-bold text-neutral-900">{measure.current}</span>
-                  <span className="text-neutral-400 ml-1">/ {measure.target}</span>
-                </div>
-                <span className="text-sm font-semibold text-primary-500">{progress}%</span>
-              </div>
-              <div className="h-2 bg-neutral-100 rounded-full overflow-hidden mb-3">
-                <div
-                  className="h-full bg-primary-400 rounded-full transition-all"
-                  style={{ width: `${Math.min(progress, 100)}%` }}
-                />
-              </div>
-              {!isNew && (
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => incrementMeasure(measure.id, -1)}
-                    className="flex-1 py-2 rounded-lg bg-neutral-100 text-neutral-600 hover:bg-neutral-200 font-medium"
-                  >
-                    −
-                  </button>
-                  <button
-                    onClick={() => incrementMeasure(measure.id, 1)}
-                    className="flex-1 py-2 rounded-lg bg-primary-100 text-primary-600 hover:bg-primary-200 font-medium"
-                  >
-                    +
-                  </button>
-                </div>
-              )}
             </div>
-          );
-        })}
-
-        {/* Add Milestone Card */}
-        {(isNew || showAddMeasure) ? (
-          <div className="bg-white rounded-xl border-2 border-dashed border-neutral-300 p-5">
-            <div className="flex items-center gap-2 mb-3">
-              <TrendingUp className="w-4 h-4 text-primary-400" />
-              <span className="text-xs font-semibold text-primary-400 uppercase tracking-wide">Add Milestone</span>
-            </div>
-            <input
-              type="text"
-              placeholder="Milestone name"
-              value={newMeasureName}
-              onChange={(e) => setNewMeasureName(e.target.value)}
-              className="w-full px-3 py-2 mb-2 text-sm border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400"
-            />
-            <div className="flex gap-2 mb-3">
-              <span className="text-neutral-500 text-sm self-center">Target:</span>
-              <input
-                type="number"
-                value={newMeasureTarget}
-                onChange={(e) => setNewMeasureTarget(parseInt(e.target.value) || 0)}
-                className="flex-1 px-3 py-2 text-sm border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400"
-              />
-            </div>
+          ) : (
             <button
-              onClick={handleAddMeasure}
-              disabled={!newMeasureName.trim()}
-              className="w-full py-2 bg-primary-400 text-white text-sm rounded-lg hover:bg-primary-500 disabled:opacity-50"
+              onClick={() => setShowAddMeasure(true)}
+              className="flex items-center gap-3 p-3 rounded-lg border-2 border-dashed border-neutral-200 text-neutral-400 hover:border-primary-300 hover:text-primary-400 transition-colors w-full"
             >
-              Add
+              <Plus className="w-5 h-5" />
+              <span className="text-sm">Add milestone</span>
             </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => setShowAddMeasure(true)}
-            className="bg-white rounded-xl border-2 border-dashed border-neutral-300 p-5 text-neutral-500 hover:border-primary-400 hover:text-primary-500 transition-colors flex items-center justify-center gap-2 min-h-[120px]"
-          >
-            <Plus className="w-5 h-5" />
-            Add Milestone
-          </button>
-        )}
+          )}
+        </div>
       </div>
 
       {/* ACTIONS Card - Full Width */}
@@ -503,7 +494,7 @@ export function GoalProfileCard({
       {isNew && (
         <button
           onClick={handleSave}
-          disabled={!objective.trim() || measures.length === 0}
+          disabled={!objective.trim()}
           className="w-full mt-6 py-4 bg-primary-400 text-white rounded-xl hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-lg"
         >
           Create Goal
