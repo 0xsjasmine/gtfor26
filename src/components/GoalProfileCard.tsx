@@ -12,8 +12,10 @@ import {
   MoreHorizontal,
   Archive,
   Trash2,
-  Star,
-  X,
+  Target,
+  Sparkles,
+  TrendingUp,
+  Zap,
 } from 'lucide-react';
 
 interface GoalProfileCardProps {
@@ -27,16 +29,14 @@ interface GoalProfileCardProps {
   onSave?: (goal: Goal) => void;
 }
 
-const categories: GoalCategory[] = ['work', 'personal', 'creative', 'relationships', 'health', 'learning'];
-
-const categoryGradients: Record<string, string> = {
-  work: 'from-amber-100 to-orange-50',
-  personal: 'from-rose-100 to-pink-50',
-  creative: 'from-violet-100 to-purple-50',
-  relationships: 'from-red-100 to-rose-50',
-  health: 'from-emerald-100 to-green-50',
-  learning: 'from-blue-100 to-cyan-50',
-};
+const categories: { id: GoalCategory; label: string }[] = [
+  { id: 'work', label: 'Work' },
+  { id: 'personal', label: 'Personal' },
+  { id: 'creative', label: 'Creative' },
+  { id: 'relationships', label: 'Relationships' },
+  { id: 'health', label: 'Health' },
+  { id: 'learning', label: 'Learning' },
+];
 
 export function GoalProfileCard({
   goal,
@@ -58,37 +58,43 @@ export function GoalProfileCard({
     addSuccessMeasure,
   } = useAppStore();
 
-  // Editable state for new goals
+  // Editable state
   const [objective, setObjective] = useState(goal?.objective || '');
   const [why, setWhy] = useState(goal?.why || '');
   const [category, setCategory] = useState<GoalCategory>(goal?.category || 'work');
   const [measures, setMeasures] = useState<SuccessMeasure[]>(goal?.success_measures || []);
   const [newMeasureName, setNewMeasureName] = useState('');
   const [newMeasureTarget, setNewMeasureTarget] = useState(10);
-
+  const [showAddMeasure, setShowAddMeasure] = useState(false);
   const [showAddAction, setShowAddAction] = useState(false);
   const [newActionText, setNewActionText] = useState('');
   const [showMenu, setShowMenu] = useState(false);
-  const [showAddMeasure, setShowAddMeasure] = useState(isNew);
 
   const actions = goal?.actions || [];
-  const focusedAction = actions.find(a => a.status === 'scheduled')
-    || actions.find(a => a.status === 'pending');
+  const displayMeasures = isNew ? measures : (goal?.success_measures || []);
   const pendingActions = actions.filter(a => a.status === 'pending' || a.status === 'scheduled');
   const completedActions = actions.filter(a => a.status === 'done');
 
-  const displayMeasures = isNew ? measures : (goal?.success_measures || []);
-
-  const totalProgress = displayMeasures.reduce((acc, m) => {
-    return acc + (m.current / m.target);
-  }, 0);
-  const progressPercent = displayMeasures.length > 0
-    ? Math.round((totalProgress / displayMeasures.length) * 100)
-    : 0;
+  const handleAddMeasure = () => {
+    if (!newMeasureName.trim()) return;
+    const newMeasure: SuccessMeasure = {
+      id: generateId(),
+      metric: newMeasureName.trim(),
+      target: newMeasureTarget,
+      current: 0,
+    };
+    if (isNew) {
+      setMeasures(prev => [...prev, newMeasure]);
+    } else if (goal) {
+      addSuccessMeasure(goal.id, newMeasure);
+    }
+    setNewMeasureName('');
+    setNewMeasureTarget(10);
+    setShowAddMeasure(false);
+  };
 
   const handleAddAction = () => {
     if (!newActionText.trim() || !goal) return;
-
     const action: GoalAction = {
       id: generateId(),
       text: newActionText.trim(),
@@ -96,16 +102,9 @@ export function GoalProfileCard({
       priority: 'medium',
       goal_id: goal.id,
     };
-
     addGoalAction(goal.id, action);
     setNewActionText('');
     setShowAddAction(false);
-  };
-
-  const setAsFocus = (actionId: string) => {
-    if (!goal) return;
-    const today = new Date().toISOString().split('T')[0];
-    scheduleAction(goal.id, actionId, today);
   };
 
   const incrementMeasure = (measureId: string, amount: number) => {
@@ -124,34 +123,12 @@ export function GoalProfileCard({
     }
   };
 
-  const handleAddMeasure = () => {
-    if (!newMeasureName.trim()) return;
-
-    const newMeasure: SuccessMeasure = {
-      id: generateId(),
-      metric: newMeasureName.trim(),
-      target: newMeasureTarget,
-      current: 0,
-    };
-
-    if (isNew) {
-      setMeasures(prev => [...prev, newMeasure]);
-    } else if (goal) {
-      addSuccessMeasure(goal.id, newMeasure);
-    }
-
-    setNewMeasureName('');
-    setNewMeasureTarget(10);
-    setShowAddMeasure(false);
-  };
-
   const removeMeasure = (measureId: string) => {
     setMeasures(prev => prev.filter(m => m.id !== measureId));
   };
 
   const handleSave = () => {
     if (!objective.trim()) return;
-
     const newGoal: Goal = {
       id: generateId(),
       user_id: '',
@@ -165,208 +142,194 @@ export function GoalProfileCard({
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
-
     onSave?.(newGoal);
+  };
+
+  const setAsFocus = (actionId: string) => {
+    if (!goal) return;
+    const today = new Date().toISOString().split('T')[0];
+    scheduleAction(goal.id, actionId, today);
   };
 
   return (
     <div className="relative">
-      {/* Side Navigation Arrows */}
+      {/* Side Navigation */}
       {!isNew && totalGoals > 1 && (
         <>
           <button
             onClick={onPrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 p-3 rounded-full bg-white border border-warm-200 shadow-lg hover:bg-warm-50 hover:scale-105 transition-all z-10"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 p-2 rounded-full bg-white border border-neutral-200 shadow-md hover:bg-neutral-50 transition-all z-10"
           >
-            <ChevronLeft className="w-6 h-6 text-warm-600" />
+            <ChevronLeft className="w-5 h-5 text-neutral-600" />
           </button>
           <button
             onClick={onNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 p-3 rounded-full bg-white border border-warm-200 shadow-lg hover:bg-warm-50 hover:scale-105 transition-all z-10"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 p-2 rounded-full bg-white border border-neutral-200 shadow-md hover:bg-neutral-50 transition-all z-10"
           >
-            <ChevronRight className="w-6 h-6 text-warm-600" />
+            <ChevronRight className="w-5 h-5 text-neutral-600" />
           </button>
         </>
       )}
 
-      {/* Hero Section */}
-      <div className={cn(
-        "relative rounded-2xl overflow-hidden mb-4",
-        "bg-gradient-to-br",
-        categoryGradients[category] || categoryGradients.work
-      )}>
-        {/* Menu / Cancel */}
-        <div className="absolute top-4 right-4 z-10">
+      {/* HSR-Style Layout: Hero Left + Cards Right on Desktop */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+
+        {/* Hero Section - Left Column */}
+        <div className="lg:col-span-2 bg-gradient-to-br from-primary-100 to-primary-50 rounded-2xl p-6 relative">
+          {/* Menu */}
+          <div className="absolute top-4 right-4">
+            {isNew ? (
+              onCancel && (
+                <button onClick={onCancel} className="text-neutral-500 hover:text-neutral-700">
+                  ✕
+                </button>
+              )
+            ) : (
+              <div className="relative">
+                <button
+                  onClick={() => setShowMenu(!showMenu)}
+                  className="p-1.5 hover:bg-white/50 rounded-lg"
+                >
+                  <MoreHorizontal className="w-5 h-5 text-neutral-600" />
+                </button>
+                {showMenu && goal && (
+                  <div className="absolute right-0 top-8 w-36 bg-white border border-neutral-200 rounded-xl shadow-lg py-1 z-20">
+                    <button
+                      onClick={() => { updateGoal(goal.id, { status: 'backlogged' }); setShowMenu(false); }}
+                      className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2"
+                    >
+                      <Archive className="w-4 h-4" /> Backlog
+                    </button>
+                    <button
+                      onClick={() => { deleteGoal(goal.id); setShowMenu(false); }}
+                      className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-50 flex items-center gap-2 text-primary-500"
+                    >
+                      <Trash2 className="w-4 h-4" /> Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Category Icon */}
+          <div className="text-6xl mb-4">{getCategoryIcon(category)}</div>
+
+          {/* Objective */}
           {isNew ? (
-            onCancel && (
-              <button
-                onClick={onCancel}
-                className="p-2 bg-white/80 hover:bg-white rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5 text-warm-600" />
-              </button>
-            )
+            <input
+              type="text"
+              placeholder="What's your goal?"
+              value={objective}
+              onChange={(e) => setObjective(e.target.value)}
+              className="w-full text-2xl font-bold text-neutral-900 bg-transparent border-none focus:outline-none placeholder:text-neutral-400"
+            />
           ) : (
-            <div className="relative">
-              <button
-                onClick={() => setShowMenu(!showMenu)}
-                className="p-2 bg-white/80 hover:bg-white rounded-lg transition-colors"
-              >
-                <MoreHorizontal className="w-5 h-5 text-warm-600" />
-              </button>
-              {showMenu && goal && (
-                <div className="absolute right-0 top-10 w-40 bg-white border border-warm-200 rounded-xl shadow-lg py-1 z-20">
-                  <button
-                    onClick={() => {
-                      updateGoal(goal.id, { status: 'backlogged' });
-                      setShowMenu(false);
-                    }}
-                    className="w-full px-4 py-2 text-left text-sm hover:bg-warm-50 flex items-center gap-2"
-                  >
-                    <Archive className="w-4 h-4" />
-                    Backlog
-                  </button>
-                  <button
-                    onClick={() => {
-                      deleteGoal(goal.id);
-                      setShowMenu(false);
-                    }}
-                    className="w-full px-4 py-2 text-left text-sm hover:bg-warm-50 flex items-center gap-2 text-accent-600"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Delete
-                  </button>
-                </div>
-              )}
-            </div>
+            <h1 className="text-2xl font-bold text-neutral-900">{goal?.objective}</h1>
+          )}
+
+          {/* Counter */}
+          {!isNew && totalGoals > 1 && (
+            <p className="text-sm text-neutral-500 mt-4">{currentIndex + 1} / {totalGoals}</p>
           )}
         </div>
 
-        {/* Hero Content */}
-        <div className="px-8 py-10 text-center">
-          {isNew ? (
-            <>
-              {/* Category Selector */}
-              <div className="flex justify-center gap-2 mb-4">
+        {/* Cards Grid - Right Column */}
+        <div className="lg:col-span-3 space-y-4">
+
+          {/* TYPE Card */}
+          <div className="bg-white rounded-xl border border-neutral-200 p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <Target className="w-4 h-4 text-primary-400" />
+              <span className="text-xs font-semibold text-primary-400 uppercase tracking-wide">Type</span>
+            </div>
+            {isNew ? (
+              <div className="flex flex-wrap gap-2">
                 {categories.map((cat) => (
                   <button
-                    key={cat}
-                    onClick={() => setCategory(cat)}
+                    key={cat.id}
+                    onClick={() => setCategory(cat.id)}
                     className={cn(
-                      "text-2xl p-2 rounded-xl transition-all",
-                      category === cat
-                        ? "bg-white/80 scale-110 shadow-md"
-                        : "opacity-50 hover:opacity-80"
+                      "px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
+                      category === cat.id
+                        ? "bg-primary-400 text-white"
+                        : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
                     )}
                   >
-                    {getCategoryIcon(cat)}
+                    {getCategoryIcon(cat.id)} {cat.label}
                   </button>
                 ))}
               </div>
-              <p className="text-xs font-medium text-warm-600 uppercase tracking-wider mb-3">
-                {category}
-              </p>
-              {/* Editable Objective */}
-              <input
-                type="text"
-                placeholder="What's your goal?"
-                value={objective}
-                onChange={(e) => setObjective(e.target.value)}
-                className="w-full text-2xl font-bold text-warm-900 bg-transparent border-none text-center focus:outline-none placeholder:text-warm-400"
+            ) : (
+              <p className="text-neutral-700">{getCategoryIcon(category)} {category.charAt(0).toUpperCase() + category.slice(1)}</p>
+            )}
+          </div>
+
+          {/* WHY THIS MATTERS Card */}
+          <div className="bg-white rounded-xl border border-neutral-200 p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="w-4 h-4 text-primary-400" />
+              <span className="text-xs font-semibold text-primary-400 uppercase tracking-wide">Why This Matters</span>
+            </div>
+            {isNew ? (
+              <textarea
+                placeholder="Your personal motivation..."
+                value={why}
+                onChange={(e) => setWhy(e.target.value)}
+                className="w-full text-neutral-700 bg-transparent border-none focus:outline-none resize-none placeholder:text-neutral-400"
+                rows={2}
               />
-            </>
-          ) : (
-            <>
-              <span className="text-5xl mb-4 block">{getCategoryIcon(category)}</span>
-              <p className="text-xs font-medium text-warm-600 uppercase tracking-wider mb-2">
-                {category}
-              </p>
-              <h1 className="text-2xl font-bold text-warm-900 leading-tight">
-                {goal?.objective}
-              </h1>
-              {!isNew && (
-                <p className="text-sm text-warm-500 mt-2">
-                  {currentIndex + 1} / {totalGoals}
-                </p>
-              )}
-            </>
-          )}
+            ) : (
+              <p className="text-neutral-700">{goal?.why || 'No motivation set'}</p>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Bento Grid */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* Full-Width Cards Below */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
 
-        {/* Motivation Card */}
-        <div className="col-span-2 bg-white rounded-xl border border-warm-200 p-5">
-          <p className="text-xs font-semibold text-warm-500 uppercase tracking-wide mb-2">
-            Why This Matters
-          </p>
-          {isNew ? (
-            <textarea
-              placeholder="Your personal motivation..."
-              value={why}
-              onChange={(e) => setWhy(e.target.value)}
-              className="w-full text-warm-700 bg-transparent border-none focus:outline-none resize-none placeholder:text-warm-300"
-              rows={2}
-            />
-          ) : (
-            <p className="text-warm-700 italic">
-              {goal?.why ? `"${goal.why}"` : 'No motivation set'}
-            </p>
-          )}
-        </div>
-
-        {/* Success Measure Cards */}
+        {/* MILESTONES Cards */}
         {displayMeasures.map((measure) => {
-          const measureProgress = Math.round((measure.current / measure.target) * 100);
+          const progress = Math.round((measure.current / measure.target) * 100);
           return (
-            <div key={measure.id} className="bg-white rounded-xl border border-warm-200 p-5 relative">
+            <div key={measure.id} className="bg-white rounded-xl border border-neutral-200 p-5 relative">
               {isNew && (
                 <button
                   onClick={() => removeMeasure(measure.id)}
-                  className="absolute top-2 right-2 p-1 text-warm-400 hover:text-warm-600"
+                  className="absolute top-3 right-3 text-neutral-400 hover:text-neutral-600"
                 >
-                  <X className="w-4 h-4" />
+                  ✕
                 </button>
               )}
-              <p className="text-xs font-semibold text-warm-500 uppercase tracking-wide mb-3">
-                {measure.metric}
-              </p>
+              <div className="flex items-center gap-2 mb-3">
+                <TrendingUp className="w-4 h-4 text-primary-400" />
+                <span className="text-xs font-semibold text-primary-400 uppercase tracking-wide">{measure.metric}</span>
+              </div>
               <div className="flex items-end justify-between mb-3">
                 <div>
-                  <span className="text-3xl font-bold text-warm-800">{measure.current}</span>
-                  <span className="text-warm-400 ml-1">/ {measure.target}</span>
+                  <span className="text-3xl font-bold text-neutral-900">{measure.current}</span>
+                  <span className="text-neutral-400 ml-1">/ {measure.target}</span>
                 </div>
-                <span className={cn(
-                  "text-sm font-semibold",
-                  measureProgress >= 75 ? "text-sage-600" :
-                  measureProgress >= 40 ? "text-warm-600" : "text-accent-600"
-                )}>
-                  {measureProgress}%
-                </span>
+                <span className="text-sm font-semibold text-primary-500">{progress}%</span>
               </div>
-              <div className="h-2 bg-warm-100 rounded-full overflow-hidden mb-3">
+              <div className="h-2 bg-neutral-100 rounded-full overflow-hidden mb-3">
                 <div
-                  className={cn(
-                    "h-full rounded-full transition-all duration-300",
-                    measureProgress >= 75 ? "bg-sage-400" :
-                    measureProgress >= 40 ? "bg-warm-400" : "bg-accent-400"
-                  )}
-                  style={{ width: `${Math.min(measureProgress, 100)}%` }}
+                  className="h-full bg-primary-400 rounded-full transition-all"
+                  style={{ width: `${Math.min(progress, 100)}%` }}
                 />
               </div>
               {!isNew && (
                 <div className="flex gap-2">
                   <button
                     onClick={() => incrementMeasure(measure.id, -1)}
-                    className="flex-1 py-2 rounded-lg bg-warm-100 text-warm-600 hover:bg-warm-200 font-medium"
+                    className="flex-1 py-2 rounded-lg bg-neutral-100 text-neutral-600 hover:bg-neutral-200 font-medium"
                   >
                     −
                   </button>
                   <button
                     onClick={() => incrementMeasure(measure.id, 1)}
-                    className="flex-1 py-2 rounded-lg bg-sage-100 text-sage-700 hover:bg-sage-200 font-medium"
+                    className="flex-1 py-2 rounded-lg bg-primary-100 text-primary-600 hover:bg-primary-200 font-medium"
                   >
                     +
                   </button>
@@ -376,211 +339,176 @@ export function GoalProfileCard({
           );
         })}
 
-        {/* Add Measure Card */}
-        {(isNew || showAddMeasure) && (
-          <div className="bg-warm-50 rounded-xl border-2 border-dashed border-warm-300 p-5">
-            <p className="text-xs font-semibold text-warm-500 uppercase tracking-wide mb-3">
-              Add Measure
-            </p>
+        {/* Add Milestone Card */}
+        {(isNew || showAddMeasure) ? (
+          <div className="bg-white rounded-xl border-2 border-dashed border-neutral-300 p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <TrendingUp className="w-4 h-4 text-primary-400" />
+              <span className="text-xs font-semibold text-primary-400 uppercase tracking-wide">Add Milestone</span>
+            </div>
             <input
               type="text"
-              placeholder="Metric name"
+              placeholder="Milestone name"
               value={newMeasureName}
               onChange={(e) => setNewMeasureName(e.target.value)}
-              className="w-full px-3 py-2 mb-2 text-sm border border-warm-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-400 bg-white"
+              className="w-full px-3 py-2 mb-2 text-sm border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400"
             />
             <div className="flex gap-2 mb-3">
-              <span className="text-warm-500 text-sm self-center">Target:</span>
+              <span className="text-neutral-500 text-sm self-center">Target:</span>
               <input
                 type="number"
                 value={newMeasureTarget}
                 onChange={(e) => setNewMeasureTarget(parseInt(e.target.value) || 0)}
-                className="flex-1 px-3 py-2 text-sm border border-warm-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-400 bg-white"
+                className="flex-1 px-3 py-2 text-sm border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400"
               />
             </div>
             <button
               onClick={handleAddMeasure}
               disabled={!newMeasureName.trim()}
-              className="w-full py-2 bg-accent-500 text-white text-sm rounded-lg hover:bg-accent-600 disabled:opacity-50"
+              className="w-full py-2 bg-primary-400 text-white text-sm rounded-lg hover:bg-primary-500 disabled:opacity-50"
             >
               Add
             </button>
           </div>
-        )}
-
-        {/* Add Measure Button (for existing goals) */}
-        {!isNew && !showAddMeasure && (
+        ) : (
           <button
             onClick={() => setShowAddMeasure(true)}
-            className="bg-warm-50 rounded-xl border-2 border-dashed border-warm-300 p-5 text-warm-500 hover:border-accent-400 hover:text-accent-600 transition-colors flex items-center justify-center gap-2"
+            className="bg-white rounded-xl border-2 border-dashed border-neutral-300 p-5 text-neutral-500 hover:border-primary-400 hover:text-primary-500 transition-colors flex items-center justify-center gap-2 min-h-[120px]"
           >
             <Plus className="w-5 h-5" />
-            Add Measure
+            Add Milestone
           </button>
         )}
+      </div>
 
-        {/* Focusing On Card (only for existing goals) */}
-        {!isNew && focusedAction && (
-          <div className="col-span-2 bg-accent-50 rounded-xl border border-accent-200 p-5">
-            <div className="flex items-center gap-2 mb-3">
-              <Star className="w-4 h-4 text-accent-500" />
-              <p className="text-xs font-semibold text-accent-600 uppercase tracking-wide">
-                Focusing On
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => goal && toggleActionComplete(goal.id, focusedAction.id)}
-                className="w-7 h-7 rounded-full border-2 border-accent-400 flex items-center justify-center hover:bg-accent-100 transition-colors flex-shrink-0"
-              >
-                {focusedAction.status === 'done' && <Check className="w-4 h-4 text-accent-500" />}
-              </button>
-              <span className="text-warm-800 font-medium text-lg">{focusedAction.text}</span>
-            </div>
-          </div>
-        )}
-
-        {/* Actions Card (only for existing goals) */}
-        {!isNew && (
-          <div className="col-span-2 bg-white rounded-xl border border-warm-200 p-5">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-xs font-semibold text-warm-500 uppercase tracking-wide">
+      {/* ACTIONS Card - Full Width */}
+      {!isNew && (
+        <div className="bg-white rounded-xl border border-neutral-200 p-5 mt-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-primary-400" />
+              <span className="text-xs font-semibold text-primary-400 uppercase tracking-wide">
                 Actions ({completedActions.length}/{actions.length})
-              </p>
-              <button
-                onClick={() => setShowAddAction(true)}
-                className="p-1.5 hover:bg-warm-100 rounded-lg transition-colors"
-              >
-                <Plus className="w-4 h-4 text-warm-500" />
-              </button>
+              </span>
             </div>
+            <button
+              onClick={() => setShowAddAction(true)}
+              className="p-1.5 hover:bg-neutral-100 rounded-lg"
+            >
+              <Plus className="w-4 h-4 text-neutral-500" />
+            </button>
+          </div>
 
-            <div className="space-y-2">
-              {pendingActions.map((action) => (
-                <div
-                  key={action.id}
-                  className={cn(
-                    "group flex items-center gap-3 p-3 rounded-lg transition-colors",
-                    action.status === 'scheduled' ? "bg-accent-50 border border-accent-100" : "bg-warm-50"
-                  )}
-                >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {pendingActions.map((action) => (
+              <div
+                key={action.id}
+                className={cn(
+                  "p-4 rounded-xl border transition-colors",
+                  action.status === 'scheduled'
+                    ? "bg-primary-50 border-primary-200"
+                    : "bg-neutral-50 border-neutral-200 hover:border-primary-300"
+                )}
+              >
+                <div className="flex items-start gap-3">
                   <button
                     onClick={() => goal && toggleActionComplete(goal.id, action.id)}
-                    className="w-5 h-5 rounded border-2 border-warm-300 flex items-center justify-center hover:border-sage-400 transition-colors flex-shrink-0"
+                    className="w-5 h-5 mt-0.5 rounded border-2 border-neutral-300 flex items-center justify-center hover:border-primary-400 transition-colors flex-shrink-0"
                   />
-                  <span className="flex-1 text-sm text-warm-700">{action.text}</span>
-                  {action.status !== 'scheduled' && (
-                    <button
-                      onClick={() => setAsFocus(action.id)}
-                      className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-warm-200 rounded transition-all"
-                      title="Set as focus"
-                    >
-                      <Star className="w-4 h-4 text-warm-400" />
-                    </button>
-                  )}
+                  <div className="flex-1">
+                    <p className="text-sm text-neutral-700">{action.text}</p>
+                    {action.status !== 'scheduled' && (
+                      <button
+                        onClick={() => setAsFocus(action.id)}
+                        className="text-xs text-primary-400 hover:text-primary-500 mt-2"
+                      >
+                        Set as focus →
+                      </button>
+                    )}
+                  </div>
                 </div>
-              ))}
+              </div>
+            ))}
 
-              {completedActions.length > 0 && (
-                <div className="pt-3 mt-2 border-t border-warm-100">
-                  {completedActions.slice(0, 2).map((action) => (
-                    <div
-                      key={action.id}
-                      className="flex items-center gap-3 p-2 opacity-50"
-                    >
-                      <div className="w-5 h-5 rounded bg-sage-100 flex items-center justify-center flex-shrink-0">
-                        <Check className="w-3 h-3 text-sage-500" />
-                      </div>
-                      <span className="flex-1 text-sm text-warm-500 line-through">{action.text}</span>
-                    </div>
-                  ))}
-                  {completedActions.length > 2 && (
-                    <p className="text-xs text-warm-400 pl-8">+{completedActions.length - 2} more</p>
-                  )}
-                </div>
-              )}
-
-              {actions.length === 0 && !showAddAction && (
-                <p className="text-sm text-warm-400 text-center py-4">
-                  No actions yet
-                </p>
-              )}
-            </div>
-
-            {showAddAction && (
-              <div className="mt-4 flex gap-2">
+            {/* Add Action Inline */}
+            {showAddAction ? (
+              <div className="p-4 rounded-xl border-2 border-dashed border-neutral-300">
                 <input
                   type="text"
-                  placeholder="Add an action..."
+                  placeholder="New action..."
                   value={newActionText}
                   onChange={(e) => setNewActionText(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleAddAction()}
-                  className="flex-1 px-4 py-2 text-sm border border-warm-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-400"
+                  className="w-full px-3 py-2 text-sm border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-400 mb-2"
                   autoFocus
                 />
-                <button
-                  onClick={handleAddAction}
-                  className="px-4 py-2 bg-accent-500 text-white text-sm rounded-lg hover:bg-accent-600"
-                >
-                  Add
-                </button>
-                <button
-                  onClick={() => {
-                    setShowAddAction(false);
-                    setNewActionText('');
-                  }}
-                  className="px-3 py-2 text-warm-500 text-sm hover:bg-warm-100 rounded-lg"
-                >
-                  Cancel
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleAddAction}
+                    className="flex-1 py-1.5 bg-primary-400 text-white text-sm rounded-lg hover:bg-primary-500"
+                  >
+                    Add
+                  </button>
+                  <button
+                    onClick={() => { setShowAddAction(false); setNewActionText(''); }}
+                    className="px-3 py-1.5 text-neutral-500 text-sm hover:bg-neutral-100 rounded-lg"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
+            ) : (
+              <button
+                onClick={() => setShowAddAction(true)}
+                className="p-4 rounded-xl border-2 border-dashed border-neutral-300 text-neutral-500 hover:border-primary-400 hover:text-primary-500 transition-colors flex items-center justify-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Add Action
+              </button>
             )}
           </div>
-        )}
 
-        {/* Save Button (for new goals) */}
-        {isNew && (
-          <div className="col-span-2">
-            <button
-              onClick={handleSave}
-              disabled={!objective.trim() || measures.length === 0}
-              className="w-full py-4 bg-accent-500 text-white rounded-xl hover:bg-accent-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-lg"
-            >
-              Create Goal
-            </button>
-          </div>
-        )}
-
-        {/* Overall Progress Card (only for existing goals) */}
-        {!isNew && displayMeasures.length > 0 && (
-          <div className="col-span-2 bg-warm-100 rounded-xl p-5">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-xs font-semibold text-warm-600 uppercase tracking-wide">
-                Overall Progress
-              </p>
-              <span className={cn(
-                "text-2xl font-bold",
-                progressPercent >= 75 ? "text-sage-600" :
-                progressPercent >= 40 ? "text-warm-700" :
-                "text-accent-600"
-              )}>
-                {progressPercent}%
-              </span>
-            </div>
-            <div className="h-3 bg-warm-200 rounded-full overflow-hidden">
-              <div
-                className={cn(
-                  "h-full rounded-full transition-all duration-500",
-                  progressPercent >= 75 ? "bg-sage-500" :
-                  progressPercent >= 40 ? "bg-warm-500" :
-                  "bg-accent-500"
+          {/* Completed Actions */}
+          {completedActions.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-neutral-100">
+              <p className="text-xs text-neutral-400 mb-2">Completed</p>
+              <div className="space-y-2">
+                {completedActions.slice(0, 3).map((action) => (
+                  <div key={action.id} className="flex items-center gap-2 text-sm text-neutral-400">
+                    <Check className="w-4 h-4" />
+                    <span className="line-through">{action.text}</span>
+                  </div>
+                ))}
+                {completedActions.length > 3 && (
+                  <p className="text-xs text-neutral-400">+{completedActions.length - 3} more</p>
                 )}
-                style={{ width: `${progressPercent}%` }}
-              />
+              </div>
             </div>
+          )}
+        </div>
+      )}
+
+      {/* BONUS WINS Card - Full Width */}
+      {!isNew && (
+        <div className="bg-white rounded-xl border border-neutral-200 p-5 mt-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="w-4 h-4 text-primary-400" />
+            <span className="text-xs font-semibold text-primary-400 uppercase tracking-wide">Bonus Wins</span>
           </div>
-        )}
-      </div>
+          <p className="text-neutral-400 text-sm">Track unexpected positive outcomes and ripple effects...</p>
+        </div>
+      )}
+
+      {/* Save Button for New Goals */}
+      {isNew && (
+        <button
+          onClick={handleSave}
+          disabled={!objective.trim() || measures.length === 0}
+          className="w-full mt-6 py-4 bg-primary-400 text-white rounded-xl hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-lg"
+        >
+          Create Goal
+        </button>
+      )}
 
       {/* Pagination Dots */}
       {!isNew && totalGoals > 1 && (
@@ -590,9 +518,7 @@ export function GoalProfileCard({
               key={i}
               className={cn(
                 "w-2 h-2 rounded-full transition-all",
-                i === currentIndex
-                  ? "bg-accent-500 w-6"
-                  : "bg-warm-300"
+                i === currentIndex ? "bg-primary-400 w-6" : "bg-neutral-300"
               )}
             />
           ))}

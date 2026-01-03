@@ -39,12 +39,10 @@ export function AIChat() {
   const currentHour = new Date().getHours();
   const greeting = currentHour < 12 ? "Good morning" : currentHour < 18 ? "Good afternoon" : "Good evening";
 
-  // Scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
 
-  // Get current context for the AI
   const getCurrentContext = () => {
     let context = `User is on the ${activeTab} tab`;
     if (activeTab === 'focus') context += ` (${focusView} view)`;
@@ -141,45 +139,45 @@ export function AIChat() {
 
   if (isChatMinimized) {
     return (
-      <div className="w-16 bg-white border-l border-warm-200 flex flex-col items-center py-4">
+      <div className="w-16 bg-white border-l border-neutral-200 flex flex-col items-center py-4">
         <button
           onClick={toggleChat}
-          className="p-3 bg-accent-100 text-accent-700 rounded-full hover:bg-accent-200 transition-colors"
+          className="p-3 bg-primary-100 text-primary-600 rounded-full hover:bg-primary-200 transition-colors"
         >
           <Maximize2 className="w-5 h-5" />
         </button>
-        <span className="mt-2 text-xs text-warm-500 [writing-mode:vertical-lr]">Chat</span>
+        <span className="mt-2 text-xs text-neutral-500 [writing-mode:vertical-lr]">Chat</span>
       </div>
     );
   }
 
   return (
-    <div className="w-80 bg-white border-l border-warm-200 flex flex-col h-screen">
+    <div className="w-80 bg-white border-l border-neutral-200 flex flex-col h-screen">
       {/* Header */}
-      <div className="p-4 border-b border-warm-100 flex items-center justify-between bg-gradient-to-r from-accent-50 to-warm-50">
+      <div className="p-4 border-b border-neutral-100 flex items-center justify-between bg-gradient-to-r from-primary-50 to-white">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-white rounded-xl shadow-sm">
-            <Sparkles className="w-5 h-5 text-accent-500" />
+            <Sparkles className="w-5 h-5 text-primary-400" />
           </div>
           <div>
-            <h2 className="font-semibold text-warm-900">Your Guide</h2>
-            <p className="text-xs text-warm-500">Reflection & Planning</p>
+            <h2 className="font-semibold text-neutral-900">Your Guide</h2>
+            <p className="text-xs text-neutral-500">Reflection & Planning</p>
           </div>
         </div>
         <button
           onClick={toggleChat}
           className="p-2 hover:bg-white/50 rounded-lg transition-colors"
         >
-          <Minimize2 className="w-4 h-4 text-warm-500" />
+          <Minimize2 className="w-4 h-4 text-neutral-500" />
         </button>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-warm-50">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-neutral-50">
         {chatMessages.length === 0 && (
           <div className="text-center py-6">
-            <p className="text-warm-800 font-medium mb-2">{greeting}!</p>
-            <p className="text-sm text-warm-500 mb-4">
+            <p className="text-neutral-800 font-medium mb-2">{greeting}!</p>
+            <p className="text-sm text-neutral-500 mb-4">
               I'm here to help you reflect, plan, and stay on track.
             </p>
             <div className="space-y-2">
@@ -187,7 +185,7 @@ export function AIChat() {
                 <button
                   key={prompt.label}
                   onClick={() => handleQuickPrompt(prompt.text)}
-                  className="block w-full px-4 py-2.5 bg-white border border-warm-200 rounded-xl text-sm text-warm-700 hover:border-accent-300 hover:bg-accent-50 transition-colors text-left"
+                  className="block w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-700 hover:border-primary-300 hover:bg-primary-50 transition-colors text-left"
                 >
                   {prompt.label}
                 </button>
@@ -208,8 +206,8 @@ export function AIChat() {
               className={cn(
                 'max-w-[85%] rounded-2xl px-4 py-2.5',
                 message.role === 'user'
-                  ? 'bg-accent-500 text-white'
-                  : 'bg-white text-warm-800 border border-warm-200 shadow-sm'
+                  ? 'bg-primary-400 text-white'
+                  : 'bg-white text-neutral-800 border border-neutral-200 shadow-sm'
               )}
             >
               <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
@@ -219,8 +217,8 @@ export function AIChat() {
 
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-white border border-warm-200 rounded-2xl px-4 py-2.5 shadow-sm">
-              <Loader2 className="w-5 h-5 text-accent-500 animate-spin" />
+            <div className="bg-white border border-neutral-200 rounded-2xl px-4 py-2.5 shadow-sm">
+              <Loader2 className="w-5 h-5 text-primary-400 animate-spin" />
             </div>
           </div>
         )}
@@ -228,16 +226,16 @@ export function AIChat() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Quick prompts when there are messages */}
+      {/* Quick prompts */}
       {chatMessages.length > 0 && chatMessages.length < 6 && (
-        <div className="px-4 py-2 border-t border-warm-100 bg-white">
+        <div className="px-4 py-2 border-t border-neutral-100 bg-white">
           <div className="flex gap-2 overflow-x-auto pb-1">
             {quickPrompts.slice(0, 3).map((prompt) => (
               <button
                 key={prompt.label}
                 onClick={() => handleQuickPrompt(prompt.text)}
                 disabled={isLoading}
-                className="px-3 py-1.5 bg-warm-50 border border-warm-200 rounded-full text-xs text-warm-600 hover:bg-accent-50 hover:border-accent-200 transition-colors whitespace-nowrap flex-shrink-0"
+                className="px-3 py-1.5 bg-neutral-50 border border-neutral-200 rounded-full text-xs text-neutral-600 hover:bg-primary-50 hover:border-primary-200 transition-colors whitespace-nowrap flex-shrink-0"
               >
                 {prompt.label}
               </button>
@@ -247,7 +245,7 @@ export function AIChat() {
       )}
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-warm-100 bg-white">
+      <form onSubmit={handleSubmit} className="p-4 border-t border-neutral-100 bg-white">
         <div className="flex items-end gap-2">
           <textarea
             ref={inputRef}
@@ -256,7 +254,7 @@ export function AIChat() {
             onKeyDown={handleKeyDown}
             placeholder="Share your thoughts..."
             rows={1}
-            className="flex-1 px-4 py-2.5 bg-warm-50 border border-warm-200 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-transparent text-sm max-h-32"
+            className="flex-1 px-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent text-sm max-h-32"
             style={{ minHeight: '44px' }}
           />
           <button
@@ -265,8 +263,8 @@ export function AIChat() {
             className={cn(
               'p-2.5 rounded-full transition-colors',
               input.trim() && !isLoading
-                ? 'bg-accent-500 text-white hover:bg-accent-600'
-                : 'bg-warm-200 text-warm-400'
+                ? 'bg-primary-400 text-white hover:bg-primary-500'
+                : 'bg-neutral-200 text-neutral-400'
             )}
           >
             <Send className="w-5 h-5" />
