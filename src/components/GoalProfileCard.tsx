@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { cn, generateId } from '@/lib/utils';
 import { useAppStore } from '@/store/app-store';
 import type { Goal, GoalCategory, SuccessMeasure } from '@/types';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft,
   ChevronRight,
@@ -118,22 +119,30 @@ export function GoalProfileCard({
   const emptySlots = Math.max(0, 3 - displayMeasures.length);
 
   return (
-    <div className="relative">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="relative"
+    >
       {/* Side Navigation - only show when multiple goals */}
       {!isNew && totalGoals > 1 && (
         <>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.1, x: -4 }}
+            whileTap={{ scale: 0.9 }}
             onClick={onPrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-8 p-3 rounded-full bg-cream-50 border border-cream-300 shadow-sm hover:bg-cream-100 transition-all z-10"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-8 p-3 rounded-full bg-white/70 backdrop-blur-sm border border-white/80 shadow-glass hover:bg-white transition-all z-10"
           >
             <ChevronLeft className="w-5 h-5 text-neutral-500" />
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.1, x: 4 }}
+            whileTap={{ scale: 0.9 }}
             onClick={onNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-8 p-3 rounded-full bg-cream-50 border border-cream-300 shadow-sm hover:bg-cream-100 transition-all z-10"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-8 p-3 rounded-full bg-white/70 backdrop-blur-sm border border-white/80 shadow-glass hover:bg-white transition-all z-10"
           >
             <ChevronRight className="w-5 h-5 text-neutral-500" />
-          </button>
+          </motion.button>
         </>
       )}
 
@@ -141,39 +150,57 @@ export function GoalProfileCard({
       <div className="space-y-6">
 
         {/* OBJECTIVE Card - Full width, clean */}
-        <div className="bg-cream-50 rounded-2xl border border-cream-200 p-8 relative">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/80 p-8 relative shadow-glass"
+        >
           {/* Menu */}
           <div className="absolute top-6 right-6">
             {isNew ? (
               onCancel && (
-                <button onClick={onCancel} className="text-neutral-400 hover:text-neutral-600 transition-colors">
+                <motion.button
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={onCancel}
+                  className="text-neutral-400 hover:text-neutral-600 transition-colors"
+                >
                   <Plus className="w-5 h-5 rotate-45" />
-                </button>
+                </motion.button>
               )
             ) : (
               <div className="relative">
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => setShowMenu(!showMenu)}
-                  className="p-2 hover:bg-cream-200 rounded-lg transition-colors"
+                  className="p-2 hover:bg-lavender-50 rounded-lg transition-colors"
                 >
                   <MoreHorizontal className="w-5 h-5 text-neutral-400" />
-                </button>
-                {showMenu && goal && (
-                  <div className="absolute right-0 top-10 w-36 bg-white border border-cream-200 rounded-xl shadow-lg py-1 z-20">
-                    <button
-                      onClick={() => { updateGoal(goal.id, { status: 'backlogged' }); setShowMenu(false); }}
-                      className="w-full px-4 py-2 text-left text-sm hover:bg-cream-50 flex items-center gap-2 text-neutral-600"
+                </motion.button>
+                <AnimatePresence>
+                  {showMenu && goal && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      className="absolute right-0 top-10 w-36 bg-white/90 backdrop-blur-sm border border-white/80 rounded-xl shadow-glass-lg py-1 z-20"
                     >
-                      <Archive className="w-4 h-4" /> Backlog
-                    </button>
-                    <button
-                      onClick={() => { deleteGoal(goal.id); setShowMenu(false); }}
-                      className="w-full px-4 py-2 text-left text-sm hover:bg-cream-50 flex items-center gap-2 text-primary-500"
-                    >
-                      <Trash2 className="w-4 h-4" /> Delete
-                    </button>
-                  </div>
-                )}
+                      <button
+                        onClick={() => { updateGoal(goal.id, { status: 'backlogged' }); setShowMenu(false); }}
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-lavender-50 flex items-center gap-2 text-neutral-600 transition-colors"
+                      >
+                        <Archive className="w-4 h-4" /> Backlog
+                      </button>
+                      <button
+                        onClick={() => { deleteGoal(goal.id); setShowMenu(false); }}
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-rose-50 flex items-center gap-2 text-rose-500 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" /> Delete
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             )}
           </div>
@@ -186,10 +213,10 @@ export function GoalProfileCard({
                 placeholder="What's your intention?"
                 value={objective}
                 onChange={(e) => setObjective(e.target.value)}
-                className="w-full text-2xl font-serif text-neutral-800 bg-transparent border-none focus:outline-none placeholder:text-neutral-400"
+                className="w-full text-2xl font-display text-neutral-800 bg-transparent border-none focus:outline-none placeholder:text-neutral-400"
               />
             ) : (
-              <h1 className="text-2xl font-serif text-neutral-800">{goal?.objective}</h1>
+              <h1 className="text-2xl font-display text-neutral-800">{goal?.objective}</h1>
             )}
           </div>
 
@@ -197,26 +224,33 @@ export function GoalProfileCard({
           {!isNew && totalGoals > 1 && (
             <p className="text-sm text-neutral-400 mt-6">{currentIndex + 1} of {totalGoals}</p>
           )}
-        </div>
+        </motion.div>
 
         {/* TYPE Card */}
-        <div className="bg-cream-50 rounded-2xl border border-cream-200 p-6">
-          <p className="text-xs font-semibold text-primary-400 uppercase tracking-wider mb-4">Type</p>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/80 p-6 shadow-glass"
+        >
+          <p className="text-xs font-semibold text-lavender-500 uppercase tracking-wider mb-4">Type</p>
           {isNew ? (
             <div className="flex flex-wrap gap-3">
               {categories.map((cat) => (
-                <button
+                <motion.button
                   key={cat.id}
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => setCategory(cat.id)}
                   className={cn(
                     "px-4 py-2 rounded-full text-sm font-medium transition-all border",
                     category === cat.id
-                      ? "border-primary-400 text-primary-600 bg-primary-50"
-                      : "border-cream-300 text-neutral-500 hover:border-cream-400 hover:text-neutral-600"
+                      ? "border-lavender-400 text-lavender-600 bg-lavender-50"
+                      : "border-neutral-200/50 text-neutral-500 hover:border-lavender-200 hover:text-neutral-600"
                   )}
                 >
                   {cat.label}
-                </button>
+                </motion.button>
               ))}
             </div>
           ) : (
@@ -224,36 +258,43 @@ export function GoalProfileCard({
               {category.charAt(0).toUpperCase() + category.slice(1)}
             </p>
           )}
-        </div>
+        </motion.div>
 
         {/* MILESTONES Section */}
         <div>
-          <p className="text-xs font-semibold text-primary-400 uppercase tracking-wider mb-4">Milestones</p>
+          <p className="text-xs font-semibold text-lavender-500 uppercase tracking-wider mb-4">Milestones</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Existing Milestones */}
-            {displayMeasures.map((measure) => {
+            {displayMeasures.map((measure, index) => {
               const isComplete = measure.current >= measure.target;
               return (
-                <div
+                <motion.div
                   key={measure.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ scale: 1.02, y: -2 }}
                   className={cn(
-                    "bg-cream-50 rounded-2xl border p-5 relative group cursor-pointer transition-all min-h-[120px]",
+                    "bg-white/70 backdrop-blur-sm rounded-2xl border p-5 relative group cursor-pointer transition-all min-h-[120px] shadow-glass",
                     isComplete
-                      ? "border-primary-300 bg-primary-50"
-                      : "border-cream-200 hover:border-primary-200"
+                      ? "border-sage-300 bg-sage-50/70"
+                      : "border-white/80 hover:border-lavender-200"
                   )}
                   onClick={() => toggleMilestone(measure.id)}
                 >
                   {/* Checkbox */}
-                  <div className={cn(
-                    "absolute top-4 right-4 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors",
-                    isComplete
-                      ? "bg-primary-400 border-primary-400"
-                      : "border-cream-400"
-                  )}>
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    className={cn(
+                      "absolute top-4 right-4 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors",
+                      isComplete
+                        ? "bg-sage-400 border-sage-400"
+                        : "border-neutral-300"
+                    )}
+                  >
                     {isComplete && <Check className="w-4 h-4 text-white" />}
-                  </div>
+                  </motion.div>
 
                   {/* Milestone Text */}
                   <p className={cn(
@@ -265,23 +306,27 @@ export function GoalProfileCard({
 
                   {/* Remove button */}
                   {isNew && (
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
                       onClick={(e) => { e.stopPropagation(); removeMeasure(measure.id); }}
-                      className="absolute bottom-4 right-4 text-neutral-400 hover:text-primary-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute bottom-4 right-4 text-neutral-400 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <Trash2 className="w-4 h-4" />
-                    </button>
+                    </motion.button>
                   )}
-                </div>
+                </motion.div>
               );
             })}
 
             {/* Add Milestone Cards */}
             {Array.from({ length: Math.min(emptySlots, isNew ? 3 - displayMeasures.length : 1) }).map((_, i) => (
               editingMilestone === `new-${i}` ? (
-                <div
+                <motion.div
                   key={`add-${i}`}
-                  className="bg-cream-50 rounded-2xl border-2 border-dashed border-primary-300 p-5 min-h-[120px]"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-white/70 backdrop-blur-sm rounded-2xl border-2 border-dashed border-lavender-300 p-5 min-h-[120px] shadow-glass"
                 >
                   <input
                     type="text"
@@ -299,22 +344,28 @@ export function GoalProfileCard({
                     className="w-full text-sm text-neutral-700 bg-transparent border-none focus:outline-none placeholder:text-neutral-400"
                     autoFocus
                   />
-                </div>
+                </motion.div>
               ) : (
-                <button
+                <motion.button
                   key={`add-${i}`}
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => setEditingMilestone(`new-${i}`)}
-                  className="bg-cream-50 rounded-2xl border-2 border-dashed border-cream-300 p-5 min-h-[120px] flex items-center justify-center text-neutral-400 hover:border-primary-300 hover:text-primary-400 transition-colors"
+                  className="bg-white/50 backdrop-blur-sm rounded-2xl border-2 border-dashed border-lavender-200 p-5 min-h-[120px] flex items-center justify-center text-lavender-400 hover:border-lavender-400 hover:text-lavender-500 hover:bg-lavender-50/50 transition-all"
                 >
                   <Plus className="w-6 h-6" />
-                </button>
+                </motion.button>
               )
             ))}
 
             {/* Extra "+" for existing goals */}
             {!isNew && displayMeasures.length >= 3 && (
               editingMilestone === 'extra' ? (
-                <div className="bg-cream-50 rounded-2xl border-2 border-dashed border-primary-300 p-5 min-h-[120px]">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-white/70 backdrop-blur-sm rounded-2xl border-2 border-dashed border-lavender-300 p-5 min-h-[120px] shadow-glass"
+                >
                   <input
                     type="text"
                     placeholder="What will you achieve?"
@@ -331,22 +382,29 @@ export function GoalProfileCard({
                     className="w-full text-sm text-neutral-700 bg-transparent border-none focus:outline-none placeholder:text-neutral-400"
                     autoFocus
                   />
-                </div>
+                </motion.div>
               ) : (
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => setEditingMilestone('extra')}
-                  className="bg-cream-50 rounded-2xl border-2 border-dashed border-cream-300 p-5 min-h-[120px] flex items-center justify-center text-neutral-400 hover:border-primary-300 hover:text-primary-400 transition-colors"
+                  className="bg-white/50 backdrop-blur-sm rounded-2xl border-2 border-dashed border-lavender-200 p-5 min-h-[120px] flex items-center justify-center text-lavender-400 hover:border-lavender-400 hover:text-lavender-500 hover:bg-lavender-50/50 transition-all"
                 >
                   <Plus className="w-6 h-6" />
-                </button>
+                </motion.button>
               )
             )}
           </div>
         </div>
 
         {/* BONUS WINS Card */}
-        <div className="bg-cream-50 rounded-2xl border border-cream-200 p-6">
-          <p className="text-xs font-semibold text-primary-400 uppercase tracking-wider mb-4">Bonus Wins</p>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/80 p-6 shadow-glass"
+        >
+          <p className="text-xs font-semibold text-lavender-500 uppercase tracking-wider mb-4">Bonus Wins</p>
           {isNew ? (
             <textarea
               placeholder="Track unexpected positive outcomes..."
@@ -358,34 +416,41 @@ export function GoalProfileCard({
           ) : (
             <p className="text-neutral-400 text-sm">Track unexpected positive outcomes...</p>
           )}
-        </div>
+        </motion.div>
 
         {/* Save Button */}
         {isNew && (
-          <button
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            whileHover={{ scale: 1.01, y: -2 }}
+            whileTap={{ scale: 0.99 }}
             onClick={handleSave}
             disabled={!objective.trim()}
-            className="w-full py-4 bg-primary-400 text-white rounded-2xl hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-lg transition-colors"
+            className="w-full py-4 bg-gradient-to-r from-lavender-400 to-lavender-500 text-white rounded-2xl hover:from-lavender-500 hover:to-lavender-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-lg transition-all shadow-dreamy"
           >
             Create Intention
-          </button>
+          </motion.button>
         )}
 
         {/* Pagination Dots */}
         {!isNew && totalGoals > 1 && (
           <div className="flex justify-center gap-2 pt-4">
             {Array.from({ length: totalGoals }).map((_, i) => (
-              <div
+              <motion.div
                 key={i}
-                className={cn(
-                  "h-2 rounded-full transition-all",
-                  i === currentIndex ? "bg-primary-400 w-8" : "bg-cream-300 w-2"
-                )}
+                initial={false}
+                animate={{
+                  width: i === currentIndex ? 32 : 8,
+                  backgroundColor: i === currentIndex ? '#B794F6' : '#E8E6E3',
+                }}
+                className="h-2 rounded-full"
               />
             ))}
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

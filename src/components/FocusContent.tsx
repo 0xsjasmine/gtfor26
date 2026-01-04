@@ -7,6 +7,7 @@ import { WeeklyWrappedModal } from './WeeklyWrappedModal';
 import { ReflectionModal } from './ReflectionModal';
 import { cn, formatDate } from '@/lib/utils';
 import type { FocusView, EnergyLevel } from '@/types';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft,
   ChevronRight,
@@ -85,9 +86,9 @@ export function FocusContent() {
       milestonesCompleted: completedMilestones,
       totalMilestones,
       actionsCompleted,
-      mostProductiveDay: 'Tuesday', // Would calculate from actual data
+      mostProductiveDay: 'Tuesday',
       goalsProgress: totalGoalProgress,
-      streakDays: 5, // Would track actual streak
+      streakDays: 5,
     };
   };
 
@@ -96,8 +97,6 @@ export function FocusContent() {
     date.setDate(date.getDate() + offset);
     setSelectedDate(date.toISOString().split('T')[0]);
   };
-
-  const goToToday = () => setSelectedDate(today);
 
   const getWeekDays = () => {
     const date = new Date(selectedDate + 'T12:00:00');
@@ -124,18 +123,21 @@ export function FocusContent() {
 
   const handleReflectionComplete = (answers: Record<string, string>) => {
     setShowReflection(false);
-    // Save reflection answers to store
     console.log('Reflection answers:', answers);
   };
 
   return (
-    <div className="h-full overflow-auto p-6 bg-cream-100">
+    <div className="h-full overflow-auto p-6 bg-transparent">
       <div className="max-w-4xl mx-auto">
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center justify-between mb-8"
+        >
           <div>
-            <h1 className="font-serif text-3xl text-neutral-800">Focus</h1>
+            <h1 className="font-display text-3xl text-neutral-800">Focus</h1>
             <p className="text-neutral-500 mt-1">
               {focusView === 'day' && formatDate(selectedDateObj, 'EEEE, MMMM d')}
               {focusView === 'week' && `Week of ${formatDate(new Date(weekDays[0] + 'T12:00:00'), 'MMM d')}`}
@@ -144,15 +146,17 @@ export function FocusContent() {
           </div>
           <div className="flex items-center gap-3">
             {!isToday && (
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => {
                   setSelectedDate(today);
                   setFocusView('day');
                 }}
-                className="px-4 py-2 text-sm bg-primary-100 text-primary-600 font-medium rounded-xl hover:bg-primary-200 transition-colors"
+                className="px-4 py-2 text-sm bg-lavender-100 text-lavender-600 font-medium rounded-xl hover:bg-lavender-200 transition-colors"
               >
                 Today
-              </button>
+              </motion.button>
             )}
             <ViewToggle
               views={focusViews}
@@ -160,88 +164,111 @@ export function FocusContent() {
               onChange={setFocusView}
             />
           </div>
-        </div>
+        </motion.div>
 
         {/* Intentions Reminder Banner */}
-        {isToday && goals.filter(g => g.status === 'active').length === 0 && (
-          <div
-            onClick={() => {
-              setReflectionType('weekly');
-              setShowReflection(true);
-            }}
-            className="mb-6 p-5 bg-cream-50 border border-cream-300 rounded-2xl cursor-pointer hover:border-primary-300 transition-colors group"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-                  <BookOpen className="w-5 h-5 text-primary-500" />
+        <AnimatePresence>
+          {isToday && goals.filter(g => g.status === 'active').length === 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              onClick={() => {
+                setReflectionType('weekly');
+                setShowReflection(true);
+              }}
+              className="mb-6 p-5 bg-white/70 backdrop-blur-sm border border-white/80 rounded-2xl cursor-pointer hover:border-lavender-300 transition-all group shadow-glass"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-lavender-100 to-lavender-200 flex items-center justify-center">
+                    <BookOpen className="w-5 h-5 text-lavender-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-neutral-800">Set your intentions</p>
+                    <p className="text-sm text-neutral-500">Start your week with clarity</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium text-neutral-800">Don't forget to set your intentions</p>
-                  <p className="text-sm text-neutral-500">Start your week with clarity</p>
-                </div>
+                <ArrowRight className="w-5 h-5 text-neutral-400 group-hover:text-lavender-500 transition-colors" />
               </div>
-              <ArrowRight className="w-5 h-5 text-neutral-400 group-hover:text-primary-400 transition-colors" />
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Day View */}
         {focusView === 'day' && (
           <div className="space-y-6">
             {/* Day Navigation */}
-            <div className="flex items-center justify-between bg-cream-50 rounded-2xl border border-cream-200 p-5">
-              <button
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-between bg-white/70 backdrop-blur-sm rounded-2xl border border-white/80 p-5 shadow-glass"
+            >
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => navigateDay(-1)}
-                className="p-2 hover:bg-cream-200 rounded-xl transition-colors"
+                className="p-2 hover:bg-lavender-50 rounded-xl transition-colors"
               >
                 <ChevronLeft className="w-5 h-5 text-neutral-600" />
-              </button>
+              </motion.button>
               <div className="text-center">
-                <p className="font-serif text-xl text-neutral-800">
+                <p className="font-display text-xl text-neutral-800">
                   {formatDate(selectedDateObj, 'EEEE')}
                 </p>
                 <p className="text-sm text-neutral-500">
                   {formatDate(selectedDateObj, 'MMMM d, yyyy')}
                 </p>
               </div>
-              <button
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => navigateDay(1)}
-                className="p-2 hover:bg-cream-200 rounded-xl transition-colors"
+                className="p-2 hover:bg-lavender-50 rounded-xl transition-colors"
               >
                 <ChevronRight className="w-5 h-5 text-neutral-600" />
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
 
             {/* Today's Focus */}
             {isToday && scheduledActions.length > 0 && (
-              <div className="bg-cream-50 rounded-2xl border border-cream-200 p-6">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/80 p-6 shadow-glass"
+              >
                 <div className="flex items-center gap-2 mb-5">
-                  <Sparkles className="w-5 h-5 text-primary-400" />
-                  <h2 className="font-serif text-xl text-neutral-800">Today's Focus</h2>
+                  <Sparkles className="w-5 h-5 text-lavender-500" />
+                  <h2 className="font-display text-xl text-neutral-800">Today's Focus</h2>
                 </div>
                 <div className="space-y-3">
-                  {scheduledActions.map(({ action, goal }) => (
-                    <div
+                  {scheduledActions.map(({ action, goal }, index) => (
+                    <motion.div
                       key={action.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
                       className={cn(
                         "flex items-start gap-4 p-4 rounded-xl transition-all",
                         action.status === 'done'
-                          ? "bg-cream-200/50"
-                          : "bg-white border border-cream-200"
+                          ? "bg-sage-50/50"
+                          : "bg-white/80 border border-neutral-200/50"
                       )}
                     >
-                      <button
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
                         onClick={() => toggleActionComplete(goal.id, action.id)}
                         className={cn(
                           "w-6 h-6 mt-0.5 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0",
                           action.status === 'done'
-                            ? "bg-primary-400 border-primary-400"
-                            : "border-cream-400 hover:border-primary-400"
+                            ? "bg-sage-400 border-sage-400"
+                            : "border-neutral-300 hover:border-lavender-400"
                         )}
                       >
                         {action.status === 'done' && <Check className="w-4 h-4 text-white" />}
-                      </button>
+                      </motion.button>
                       <div className="flex-1">
                         <p className={cn(
                           "font-medium",
@@ -253,44 +280,55 @@ export function FocusContent() {
                         </p>
                         <p className="text-sm text-neutral-400 mt-1">{goal.objective}</p>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             )}
 
             {/* Empty State */}
             {isToday && scheduledActions.length === 0 && goals.filter(g => g.status === 'active').length > 0 && (
-              <div className="bg-cream-50 rounded-2xl border border-cream-200 p-8 text-center">
-                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-cream-200 flex items-center justify-center">
-                  <Sparkles className="w-6 h-6 text-neutral-400" />
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/80 p-8 text-center shadow-glass"
+              >
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-lavender-50 flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-lavender-400" />
                 </div>
-                <p className="font-serif text-lg text-neutral-700">Nothing scheduled for today</p>
+                <p className="font-display text-lg text-neutral-700">Nothing scheduled for today</p>
                 <p className="text-sm text-neutral-500 mt-2">Visit your intentions and pick something to focus on</p>
-              </div>
+              </motion.div>
             )}
 
             {/* Energy Check */}
             {isToday && (
-              <div className="bg-cream-50 rounded-2xl border border-cream-200 p-5">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/80 p-5 shadow-glass"
+              >
                 <p className="text-sm font-medium text-neutral-600 mb-4">How's your energy?</p>
                 <div className="flex gap-2">
                   {energyLevels.map((level) => (
-                    <button
+                    <motion.button
                       key={level.value}
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => updateTodayEnergy(level.value)}
                       className={cn(
                         "flex-1 py-3 rounded-xl text-xs font-medium transition-all",
                         todayContext?.energy_level === level.value
-                          ? "bg-primary-400 text-white"
-                          : "bg-cream-200 text-neutral-600 hover:bg-cream-300"
+                          ? "bg-gradient-to-r from-lavender-400 to-lavender-500 text-white shadow-soft"
+                          : "bg-neutral-100/80 text-neutral-600 hover:bg-neutral-200/80"
                       )}
                     >
                       {level.label}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             )}
           </div>
         )}
@@ -299,45 +337,56 @@ export function FocusContent() {
         {focusView === 'week' && (
           <div className="space-y-6">
             {/* Week Navigation */}
-            <div className="flex items-center justify-between bg-cream-50 rounded-2xl border border-cream-200 p-5">
-              <button
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-between bg-white/70 backdrop-blur-sm rounded-2xl border border-white/80 p-5 shadow-glass"
+            >
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => navigateDay(-7)}
-                className="p-2 hover:bg-cream-200 rounded-xl transition-colors"
+                className="p-2 hover:bg-lavender-50 rounded-xl transition-colors"
               >
                 <ChevronLeft className="w-5 h-5 text-neutral-600" />
-              </button>
-              <p className="font-serif text-xl text-neutral-800">
+              </motion.button>
+              <p className="font-display text-xl text-neutral-800">
                 {formatDate(new Date(weekDays[0] + 'T12:00:00'), 'MMM d')} - {formatDate(new Date(weekDays[6] + 'T12:00:00'), 'MMM d, yyyy')}
               </p>
-              <button
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => navigateDay(7)}
-                className="p-2 hover:bg-cream-200 rounded-xl transition-colors"
+                className="p-2 hover:bg-lavender-50 rounded-xl transition-colors"
               >
                 <ChevronRight className="w-5 h-5 text-neutral-600" />
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
 
             {/* Weekly Planning Banner */}
-            <div
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
               onClick={() => {
                 setReflectionType('weekly');
                 setShowReflection(true);
               }}
-              className="p-5 bg-cream-50 border border-cream-200 rounded-2xl cursor-pointer hover:border-primary-300 transition-colors group"
+              className="p-5 bg-white/70 backdrop-blur-sm border border-white/80 rounded-2xl cursor-pointer hover:border-lavender-300 transition-all group shadow-glass"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-                    <BookOpen className="w-5 h-5 text-primary-500" />
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-lavender-100 to-lavender-200 flex items-center justify-center">
+                    <BookOpen className="w-5 h-5 text-lavender-600" />
                   </div>
                   <div>
                     <p className="font-medium text-neutral-800">Weekly Planning</p>
                     <p className="text-sm text-neutral-500">Set your intentions for the week</p>
                   </div>
                 </div>
-                <ArrowRight className="w-5 h-5 text-neutral-400 group-hover:text-primary-400 transition-colors" />
+                <ArrowRight className="w-5 h-5 text-neutral-400 group-hover:text-lavender-500 transition-colors" />
               </div>
-            </div>
+            </motion.div>
 
             {/* Week Calendar */}
             <div className="grid grid-cols-7 gap-3">
@@ -346,30 +395,34 @@ export function FocusContent() {
                   {day}
                 </div>
               ))}
-              {weekDays.map((date) => {
+              {weekDays.map((date, index) => {
                 const dayActions = getActionsForDate(date);
                 const isTodayDate = date === today;
                 const isWeekend = [0, 6].includes(new Date(date + 'T12:00:00').getDay());
 
                 return (
-                  <button
+                  <motion.button
                     key={date}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.03 }}
+                    whileHover={{ scale: 1.02, y: -2 }}
                     onClick={() => {
                       setSelectedDate(date);
                       setFocusView('day');
                     }}
                     className={cn(
-                      "p-4 rounded-xl border transition-all min-h-[120px] flex flex-col",
+                      "p-4 rounded-xl border transition-all min-h-[120px] flex flex-col backdrop-blur-sm",
                       isTodayDate
-                        ? "border-primary-300 bg-primary-50"
+                        ? "border-lavender-300 bg-lavender-50/80 shadow-soft"
                         : isWeekend
-                        ? "border-cream-200 bg-cream-100"
-                        : "border-cream-200 bg-cream-50 hover:border-cream-400"
+                        ? "border-white/60 bg-white/40"
+                        : "border-white/80 bg-white/60 hover:border-lavender-200 shadow-glass"
                     )}
                   >
                     <span className={cn(
-                      "text-lg font-serif",
-                      isTodayDate ? "text-primary-600" : "text-neutral-700"
+                      "text-lg font-display",
+                      isTodayDate ? "text-lavender-600" : "text-neutral-700"
                     )}>
                       {new Date(date + 'T12:00:00').getDate()}
                     </span>
@@ -381,8 +434,8 @@ export function FocusContent() {
                             className={cn(
                               "text-xs px-2 py-1 rounded truncate",
                               action.status === 'done'
-                                ? "bg-cream-300 text-neutral-500 line-through"
-                                : "bg-white text-neutral-600"
+                                ? "bg-sage-100 text-sage-600 line-through"
+                                : "bg-white/80 text-neutral-600"
                             )}
                           >
                             {action.text}
@@ -393,7 +446,7 @@ export function FocusContent() {
                         )}
                       </div>
                     )}
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
@@ -403,52 +456,64 @@ export function FocusContent() {
         {/* Month View */}
         {focusView === 'month' && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between bg-cream-50 rounded-2xl border border-cream-200 p-5">
-              <button
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-between bg-white/70 backdrop-blur-sm rounded-2xl border border-white/80 p-5 shadow-glass"
+            >
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => {
                   const date = new Date(selectedDate + 'T12:00:00');
                   date.setMonth(date.getMonth() - 1);
                   setSelectedDate(date.toISOString().split('T')[0]);
                 }}
-                className="p-2 hover:bg-cream-200 rounded-xl transition-colors"
+                className="p-2 hover:bg-lavender-50 rounded-xl transition-colors"
               >
                 <ChevronLeft className="w-5 h-5 text-neutral-600" />
-              </button>
-              <p className="font-serif text-xl text-neutral-800">
+              </motion.button>
+              <p className="font-display text-xl text-neutral-800">
                 {formatDate(selectedDateObj, 'MMMM yyyy')}
               </p>
-              <button
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => {
                   const date = new Date(selectedDate + 'T12:00:00');
                   date.setMonth(date.getMonth() + 1);
                   setSelectedDate(date.toISOString().split('T')[0]);
                 }}
-                className="p-2 hover:bg-cream-200 rounded-xl transition-colors"
+                className="p-2 hover:bg-lavender-50 rounded-xl transition-colors"
               >
                 <ChevronRight className="w-5 h-5 text-neutral-600" />
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
 
             {/* Month Stats */}
             <div className="grid grid-cols-3 gap-4">
-              <div className="bg-cream-50 rounded-2xl border border-cream-200 p-5 text-center">
-                <p className="font-serif text-3xl text-neutral-800">
-                  {goals.filter(g => g.status === 'active').length}
-                </p>
-                <p className="text-sm text-neutral-500 mt-1">Intentions</p>
-              </div>
-              <div className="bg-primary-50 rounded-2xl border border-primary-200 p-5 text-center">
-                <p className="font-serif text-3xl text-primary-600">
-                  {goals.reduce((acc, g) => acc + g.actions.filter(a => a.status === 'done').length, 0)}
-                </p>
-                <p className="text-sm text-neutral-500 mt-1">Done</p>
-              </div>
-              <div className="bg-cream-50 rounded-2xl border border-cream-200 p-5 text-center">
-                <p className="font-serif text-3xl text-neutral-600">
-                  {goals.reduce((acc, g) => acc + g.actions.filter(a => a.status !== 'done').length, 0)}
-                </p>
-                <p className="text-sm text-neutral-500 mt-1">Remaining</p>
-              </div>
+              {[
+                { label: 'Intentions', value: goals.filter(g => g.status === 'active').length, gradient: 'from-lavender-50 to-lavender-100', border: 'border-lavender-200/50' },
+                { label: 'Done', value: goals.reduce((acc, g) => acc + g.actions.filter(a => a.status === 'done').length, 0), gradient: 'from-sage-50 to-sage-100', border: 'border-sage-200/50' },
+                { label: 'Remaining', value: goals.reduce((acc, g) => acc + g.actions.filter(a => a.status !== 'done').length, 0), gradient: 'from-rose-50 to-rose-100', border: 'border-rose-200/50' },
+              ].map((stat, index) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={cn(
+                    "bg-gradient-to-br rounded-2xl border p-5 text-center backdrop-blur-sm shadow-glass",
+                    stat.gradient,
+                    stat.border
+                  )}
+                >
+                  <p className="font-display text-3xl text-neutral-800">
+                    {stat.value}
+                  </p>
+                  <p className="text-sm text-neutral-500 mt-1">{stat.label}</p>
+                </motion.div>
+              ))}
             </div>
           </div>
         )}
