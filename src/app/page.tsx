@@ -1,7 +1,15 @@
 'use client';
 
-import { SideNav, MainContent, AIChat, LandingPage } from '@/components';
-import { FlowingBackground } from '@/components/FlowingBackground';
+import {
+  SideNav,
+  MainContent,
+  AIChat,
+  LandingPage,
+  AuroraBackground,
+  CustomCursor,
+  SoundProvider,
+  InteractiveParticles,
+} from '@/components';
 import { useEffect, useState } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { getCurrentQuarter } from '@/lib/utils';
@@ -37,36 +45,44 @@ export default function Home() {
   }
 
   return (
-    <AnimatePresence mode="wait">
-      {!isOnboarded ? (
-        <motion.div
-          key="landing"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0, scale: 1.02 }}
-          transition={{ duration: 0.5 }}
-        >
-          <LandingPage onEnter={handleEnterApp} />
-        </motion.div>
-      ) : (
-        <motion.div
-          key="app"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="relative"
-        >
-          {/* Dreamy background for main app */}
-          <FlowingBackground />
+    <SoundProvider>
+      {/* Custom cursor with particle trail */}
+      <CustomCursor />
 
-          {/* Main app content */}
-          <div className="relative z-10 flex h-screen overflow-hidden">
-            <SideNav />
-            <MainContent />
-            <AIChat />
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+      <AnimatePresence mode="wait">
+        {!isOnboarded ? (
+          <motion.div
+            key="landing"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 1.02 }}
+            transition={{ duration: 0.5 }}
+          >
+            <LandingPage onEnter={handleEnterApp} />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="app"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="relative"
+          >
+            {/* Three.js Aurora background */}
+            <AuroraBackground />
+
+            {/* Interactive particle constellation */}
+            <InteractiveParticles />
+
+            {/* Main app content */}
+            <div className="relative z-10 flex h-screen overflow-hidden">
+              <SideNav />
+              <MainContent />
+              <AIChat />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </SoundProvider>
   );
 }

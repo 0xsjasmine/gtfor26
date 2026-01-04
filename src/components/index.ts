@@ -15,3 +15,30 @@ export { MainContent } from './MainContent';
 export { AIChat } from './AIChat';
 export { FlowingBackground } from './FlowingBackground';
 export { LandingPage } from './LandingPage';
+
+// Tier 3 Advanced Interactive Components
+export { AuroraBackground } from './AuroraBackground';
+export { MagneticCard, MagneticButton } from './MagneticCard';
+export { InteractiveParticles } from './InteractiveParticles';
+export { CustomCursor } from './CustomCursor';
+export { CelebrationEffect, Sparkle, SuccessCheck } from './CelebrationEffect';
+export { FlowVisualization, FlowDots } from './FlowVisualization';
+export {
+  PageTransition,
+  StaggerContainer,
+  StaggerItem,
+  ModalTransition,
+  SlideIn,
+  PopIn
+} from './PageTransition';
+export {
+  ScrollReveal,
+  Parallax,
+  ScrollScale,
+  BlurReveal,
+  CountUp,
+  StaggerReveal,
+  RotateReveal,
+  ScrollProgress
+} from './ScrollReveal';
+export { SoundProvider, SoundToggle, useSounds, useSoundButton } from './SoundSystem';

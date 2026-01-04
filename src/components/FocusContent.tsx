@@ -1,10 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { ViewToggle } from './ViewToggle';
 import { WeeklyWrappedModal } from './WeeklyWrappedModal';
 import { ReflectionModal } from './ReflectionModal';
+import { FlowVisualization } from './FlowVisualization';
+import { CelebrationEffect, Sparkle } from './CelebrationEffect';
+import { useSounds } from './SoundSystem';
 import { cn, formatDate } from '@/lib/utils';
 import type { FocusView, EnergyLevel } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -48,6 +51,10 @@ export function FocusContent() {
   const [showReflection, setShowReflection] = useState(false);
   const [reflectionType, setReflectionType] = useState<'weekly' | 'daily'>('weekly');
   const [hasSeenWrapped, setHasSeenWrapped] = useState(false);
+  const [celebrationTrigger, setCelebrationTrigger] = useState(false);
+  const [celebrationOrigin, setCelebrationOrigin] = useState({ x: 0, y: 0 });
+  const [sparklePosition, setSparklePosition] = useState({ x: 0, y: 0, trigger: false });
+  const { playSound } = useSounds();
 
   const today = new Date().toISOString().split('T')[0];
   const isToday = selectedDate === today;
@@ -259,7 +266,32 @@ export function FocusContent() {
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        onClick={() => toggleActionComplete(goal.id, action.id)}
+                        onClick={(e) => {
+                          const rect = (e.target as HTMLElement).getBoundingClientRect();
+                          const wasNotDone = action.status !== 'done';
+                          toggleActionComplete(goal.id, action.id);
+
+                          if (wasNotDone) {
+                            playSound('complete');
+                            setSparklePosition({
+                              x: rect.left + rect.width / 2,
+                              y: rect.top + rect.height / 2,
+                              trigger: true,
+                            });
+                            setTimeout(() => setSparklePosition(prev => ({ ...prev, trigger: false })), 100);
+
+                            // Check if all actions are now done for a big celebration
+                            const allDone = scheduledActions.every(({ action: a }) =>
+                              a.id === action.id || a.status === 'done'
+                            );
+                            if (allDone && scheduledActions.length > 1) {
+                              playSound('celebration');
+                              setCelebrationOrigin({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+                              setCelebrationTrigger(true);
+                              setTimeout(() => setCelebrationTrigger(false), 100);
+                            }
+                          }
+                        }}
                         className={cn(
                           "w-6 h-6 mt-0.5 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0",
                           action.status === 'done'
@@ -301,7 +333,7 @@ export function FocusContent() {
               </motion.div>
             )}
 
-            {/* Energy Check */}
+            {/* Energy Check with Flow Visualization */}
             {isToday && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -310,28 +342,34 @@ export function FocusContent() {
                 className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/80 p-5 shadow-glass"
               >
                 <p className="text-sm font-medium text-neutral-600 mb-4">How's your energy?</p>
-                <div className="flex gap-2">
-                  {energyLevels.map((level) => (
-                    <motion.button
-                      key={level.value}
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => updateTodayEnergy(level.value)}
-                      className={cn(
-                        "flex-1 py-3 rounded-xl text-xs font-medium transition-all",
-                        todayContext?.energy_level === level.value
-                          ? "bg-gradient-to-r from-lavender-400 to-lavender-500 text-white shadow-soft"
-                          : "bg-neutral-100/80 text-neutral-600 hover:bg-neutral-200/80"
-                      )}
-                    >
-                      {level.label}
-                    </motion.button>
-                  ))}
-                </div>
+                <FlowVisualization
+                  value={todayContext?.energy_level || 3}
+                  onChange={(level) => {
+                    playSound('toggle');
+                    updateTodayEnergy(level);
+                  }}
+                  labels={energyLevels}
+                />
               </motion.div>
             )}
           </div>
         )}
+
+        {/* Celebration Effects */}
+        <CelebrationEffect
+          trigger={celebrationTrigger}
+          origin={celebrationOrigin}
+          type="confetti"
+          particleCount={60}
+          onComplete={() => setCelebrationTrigger(false)}
+        />
+
+        {/* Sparkle effect for task completion */}
+        <Sparkle
+          trigger={sparklePosition.trigger}
+          x={sparklePosition.x}
+          y={sparklePosition.y}
+        />
 
         {/* Week View */}
         {focusView === 'week' && (
